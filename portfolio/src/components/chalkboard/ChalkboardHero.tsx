@@ -6,7 +6,7 @@ import { featuredTheorems } from '@/lib/theorems';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // CHALKBOARD HERO - Self-Writing Mathematical Proofs
-// Progressive reveal animation with chalk texture effect
+// Clean chalk writing animation without distortion effects
 // ═══════════════════════════════════════════════════════════════════════════════
 
 interface ChalkDustParticle {
@@ -31,7 +31,6 @@ export default function ChalkboardHero() {
   const dustCanvasRef = useRef<HTMLCanvasElement>(null);
   const infoRef = useRef<HTMLDivElement>(null);
   const chalkRef = useRef<HTMLDivElement>(null);
-  const revealMaskRef = useRef<HTMLDivElement>(null);
 
   const [theorem] = useState(getRandomTheorem);
   const [animationPhase, setAnimationPhase] = useState<'waiting' | 'writing' | 'complete'>('waiting');
@@ -75,22 +74,22 @@ export default function ChalkboardHero() {
     }
   }, [theorem]);
 
-  // Spawn dust particle
+  // Spawn dust particle at position
   const spawnDust = useCallback((x: number, y: number) => {
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 3; i++) {
       dustParticlesRef.current.push({
         x,
         y,
-        vx: (Math.random() - 0.5) * 1.2,
-        vy: -Math.random() * 1.2 - 0.2,
-        size: Math.random() * 1.5 + 0.5,
-        opacity: Math.random() * 0.35 + 0.15,
-        life: 50 + Math.random() * 30,
+        vx: (Math.random() - 0.5) * 2,
+        vy: -Math.random() * 2 - 0.5,
+        size: Math.random() * 2 + 1,
+        opacity: Math.random() * 0.5 + 0.3,
+        life: 40 + Math.random() * 30,
       });
     }
   }, []);
 
-  // Setup and animate dust particles
+  // Setup and animate dust particles on canvas
   useEffect(() => {
     const canvas = dustCanvasRef.current;
     const container = containerRef.current;
@@ -119,14 +118,14 @@ export default function ChalkboardHero() {
       dustParticlesRef.current = dustParticlesRef.current.filter((p) => {
         p.x += p.vx;
         p.y += p.vy;
-        p.vy += 0.015;
-        p.vx *= 0.995;
+        p.vy += 0.05; // gravity
+        p.vx *= 0.98;
         p.life--;
-        p.opacity *= 0.985;
+        p.opacity *= 0.96;
 
         if (p.life > 0 && p.opacity > 0.01) {
           ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size * (p.life / 50), 0, Math.PI * 2);
+          ctx.arc(p.x, p.y, p.size * (p.life / 40), 0, Math.PI * 2);
           ctx.fillStyle = `rgba(245, 245, 240, ${p.opacity})`;
           ctx.fill();
           return true;
@@ -155,23 +154,26 @@ export default function ChalkboardHero() {
     const startDelay = setTimeout(() => {
       setAnimationPhase('writing');
 
-      const duration = 3500; // 3.5 seconds
+      const duration = 4000; // 4 seconds for writing
       const startTime = performance.now();
 
       const animateReveal = (currentTime: number) => {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
 
-        // Easing function for smooth reveal
+        // Ease-out cubic for natural writing feel
         const eased = 1 - Math.pow(1 - progress, 3);
         setRevealProgress(eased);
 
-        // Spawn dust particles at the writing edge
-        if (containerRef.current && progress < 1 && Math.random() > 0.7) {
+        // Spawn dust particles at writing position
+        if (containerRef.current && progress < 1) {
           const rect = containerRef.current.getBoundingClientRect();
-          const writeX = rect.width * 0.15 + eased * rect.width * 0.7;
-          const writeY = rect.height * 0.45 + (Math.random() - 0.5) * 30;
-          spawnDust(writeX, writeY);
+          const writeX = rect.width * 0.1 + eased * rect.width * 0.8;
+          const writeY = rect.height * 0.5 + (Math.random() - 0.5) * 40;
+
+          if (Math.random() > 0.6) {
+            spawnDust(writeX, writeY);
+          }
         }
 
         if (progress < 1) {
@@ -182,7 +184,7 @@ export default function ChalkboardHero() {
       };
 
       chalkAnimFrameRef.current = requestAnimationFrame(animateReveal);
-    }, 800);
+    }, 600);
 
     return () => {
       clearTimeout(startDelay);
@@ -197,50 +199,49 @@ export default function ChalkboardHero() {
     if (!chalk || !container) return;
 
     const rect = container.getBoundingClientRect();
-    const startX = rect.width * 0.12;
-    const endX = rect.width * 0.88;
-    const centerY = rect.height * 0.45;
+    const startX = rect.width * 0.08;
+    const endX = rect.width * 0.92;
+    const centerY = rect.height * 0.5;
 
     if (animationPhase === 'waiting') {
       chalk.style.opacity = '0';
     } else if (animationPhase === 'writing') {
       chalk.style.opacity = '1';
+      chalk.style.transition = 'none';
 
       const x = startX + revealProgress * (endX - startX);
-      const wobbleY = Math.sin(revealProgress * Math.PI * 8) * 2;
-      const wobbleAngle = Math.sin(revealProgress * Math.PI * 6) * 6;
+      const wobbleY = Math.sin(revealProgress * Math.PI * 12) * 3;
+      const wobbleAngle = Math.sin(revealProgress * Math.PI * 8) * 8;
 
       chalk.style.left = `${x}px`;
-      chalk.style.top = `${centerY + wobbleY - 50}px`;
-      chalk.style.transform = `rotate(${-25 + wobbleAngle}deg) translateX(-50%)`;
+      chalk.style.top = `${centerY + wobbleY - 60}px`;
+      chalk.style.transform = `rotate(${-30 + wobbleAngle}deg) translateX(-50%)`;
     } else if (animationPhase === 'complete') {
-      // Smooth transition to rest
-      chalk.style.transition = 'all 0.5s ease-out';
-      chalk.style.left = `${rect.width - 80}px`;
-      chalk.style.top = `${rect.height - 45}px`;
-      chalk.style.transform = 'rotate(75deg) translateX(-50%)';
+      chalk.style.transition = 'all 0.6s ease-out';
+      chalk.style.left = `${rect.width - 70}px`;
+      chalk.style.top = `${rect.height - 40}px`;
+      chalk.style.transform = 'rotate(80deg) translateX(-50%)';
     }
   }, [animationPhase, revealProgress]);
 
   return (
     <section id="hero" className="relative min-h-screen flex items-center justify-center py-20 px-6 overflow-hidden">
-      {/* Atmospheric warm light gradients */}
+      {/* Atmospheric gradients */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background: `
             radial-gradient(ellipse at 50% 15%, rgba(201, 162, 39, 0.05) 0%, transparent 50%),
-            radial-gradient(ellipse at 25% 75%, rgba(139, 115, 85, 0.04) 0%, transparent 45%),
-            radial-gradient(ellipse at 75% 85%, rgba(139, 115, 85, 0.03) 0%, transparent 45%)
+            radial-gradient(ellipse at 25% 75%, rgba(139, 115, 85, 0.04) 0%, transparent 45%)
           `,
         }}
       />
 
-      {/* Sage vignette */}
+      {/* Vignette */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse at center, transparent 35%, rgba(26, 42, 26, 0.35) 100%)',
+          background: 'radial-gradient(ellipse at center, transparent 40%, rgba(26, 42, 26, 0.4) 100%)',
         }}
       />
 
@@ -261,214 +262,161 @@ export default function ChalkboardHero() {
         {/* Chalkboard */}
         <div
           ref={containerRef}
-          className="relative aspect-video max-w-4xl mx-auto rounded overflow-hidden"
+          className="relative aspect-video max-w-4xl mx-auto rounded-sm overflow-hidden"
           style={{
-            background: `linear-gradient(145deg, #1A2A25 0%, #152520 30%, #101D18 60%, #0C1612 100%)`,
+            background: `linear-gradient(160deg,
+              #1e3a2f 0%,
+              #1a332a 20%,
+              #162b23 50%,
+              #12231c 80%,
+              #0e1b16 100%
+            )`,
             boxShadow: `
-              inset 0 0 100px rgba(0, 0, 0, 0.5),
-              inset 0 0 40px rgba(26, 42, 37, 0.3),
-              0 0 0 8px #4A3728,
-              0 0 0 12px #5C4033,
-              0 0 0 14px #6B5344,
-              0 25px 80px rgba(0, 0, 0, 0.6)
+              inset 0 0 80px rgba(0, 0, 0, 0.4),
+              inset 0 2px 4px rgba(255, 255, 255, 0.03),
+              0 0 0 6px #3d2817,
+              0 0 0 10px #4a3220,
+              0 0 0 12px #5a3d28,
+              0 20px 60px rgba(0, 0, 0, 0.5)
             `,
           }}
         >
-          {/* Slate texture overlay */}
+          {/* Subtle board texture */}
           <div
-            className="absolute inset-0 pointer-events-none opacity-15"
+            className="absolute inset-0 pointer-events-none opacity-[0.08]"
             style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-              mixBlendMode: 'overlay',
+              backgroundImage: `
+                repeating-linear-gradient(
+                  90deg,
+                  transparent,
+                  transparent 2px,
+                  rgba(255,255,255,0.03) 2px,
+                  rgba(255,255,255,0.03) 4px
+                )
+              `,
             }}
           />
 
-          {/* Subtle light reflection at top */}
+          {/* Light reflection at top */}
           <div
-            className="absolute top-0 left-0 right-0 h-24 pointer-events-none"
+            className="absolute top-0 left-0 right-0 h-20 pointer-events-none"
             style={{
-              background: 'linear-gradient(180deg, rgba(255,255,255,0.015) 0%, transparent 100%)',
-            }}
-          />
-
-          {/* Worn chalk area (subtle) */}
-          <div
-            className="absolute pointer-events-none"
-            style={{
-              top: '20%', left: '15%', width: '30%', height: '40%',
-              background: 'radial-gradient(ellipse, rgba(255,255,255,0.04) 0%, transparent 60%)',
+              background: 'linear-gradient(180deg, rgba(255,255,255,0.02) 0%, transparent 100%)',
             }}
           />
 
           {/* Dust particles canvas */}
           <canvas
             ref={dustCanvasRef}
-            className="absolute inset-0 w-full h-full pointer-events-none z-20"
+            className="absolute inset-0 w-full h-full pointer-events-none z-10"
           />
 
           {/* KaTeX equation with reveal animation */}
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center px-4">
             <div
-              ref={revealMaskRef}
-              className="relative overflow-hidden px-8"
+              className="relative overflow-hidden"
               style={{
-                clipPath: `inset(0 ${100 - revealProgress * 100}% 0 0)`,
+                clipPath: `inset(0 ${Math.max(0, 100 - revealProgress * 100)}% 0 0)`,
               }}
             >
               <div
                 ref={katexRef}
-                className="katex-chalk"
+                className="katex-chalk whitespace-nowrap"
                 style={{
-                  color: '#F5F5F0',
-                  fontSize: 'clamp(1.2rem, 3vw, 2.2rem)',
+                  color: '#f0efe8',
+                  fontSize: 'clamp(1.1rem, 2.5vw, 2rem)',
                   textShadow: `
-                    0 0 8px rgba(245, 245, 240, 0.4),
-                    0 0 16px rgba(245, 245, 240, 0.2),
-                    1px 1px 2px rgba(0, 0, 0, 0.3)
+                    0 0 4px rgba(240, 239, 232, 0.6),
+                    0 0 8px rgba(240, 239, 232, 0.3),
+                    0 0 12px rgba(240, 239, 232, 0.15)
                   `,
-                  filter: 'url(#chalkFilter)',
+                  letterSpacing: '0.02em',
                 }}
               />
             </div>
           </div>
 
-          {/* SVG filter for chalk texture */}
-          <svg className="absolute w-0 h-0" aria-hidden="true">
-            <defs>
-              <filter id="chalkFilter" x="-10%" y="-10%" width="120%" height="120%">
-                <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" seed="1" />
-                <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.5" xChannelSelector="R" yChannelSelector="G" />
-              </filter>
-            </defs>
-          </svg>
-
-          {/* Hagoromo chalk stick */}
+          {/* Chalk stick */}
           <div
             ref={chalkRef}
-            className="absolute pointer-events-none z-30"
-            style={{
-              opacity: 0,
-              transition: 'opacity 0.3s ease',
-            }}
+            className="absolute pointer-events-none z-20"
+            style={{ opacity: 0 }}
           >
             <div className="relative">
-              {/* Main chalk body */}
+              {/* Chalk body */}
               <div
-                className="w-3.5 h-14 rounded-full relative overflow-hidden"
+                className="w-3 h-12 rounded-full"
                 style={{
                   background: `linear-gradient(90deg,
-                    #D0D0C8 0%,
-                    #E8E8E0 15%,
-                    #F5F5F0 30%,
-                    #FFFFFF 50%,
-                    #F5F5F0 70%,
-                    #E8E8E0 85%,
-                    #D0D0C8 100%
+                    #d4d4cc 0%,
+                    #e8e8e2 20%,
+                    #f5f5f0 50%,
+                    #e8e8e2 80%,
+                    #d4d4cc 100%
                   )`,
                   boxShadow: `
-                    inset 2px 0 4px rgba(255,255,255,0.7),
-                    inset -2px 0 4px rgba(0,0,0,0.1),
-                    0 2px 8px rgba(0,0,0,0.35)
+                    inset 1px 0 3px rgba(255,255,255,0.8),
+                    inset -1px 0 2px rgba(0,0,0,0.1),
+                    0 2px 6px rgba(0,0,0,0.3)
                   `,
                 }}
-              >
-                {/* Chalk texture */}
-                <div
-                  className="absolute inset-0 opacity-20"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-                  }}
-                />
-                {/* Worn tip */}
-                <div
-                  className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3 h-3 rounded-b-full"
-                  style={{
-                    background: 'linear-gradient(180deg, #E8E8E0 0%, #C8C8C0 100%)',
-                  }}
-                />
-              </div>
-              {/* Shadow */}
+              />
+              {/* Chalk tip wear */}
               <div
-                className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-5 h-1.5 rounded-full"
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2.5 h-2 rounded-b-full"
                 style={{
-                  background: 'rgba(0,0,0,0.3)',
-                  filter: 'blur(2px)',
+                  background: 'linear-gradient(180deg, #e0e0d8 0%, #c0c0b8 100%)',
                 }}
               />
             </div>
           </div>
 
-          {/* Chalk ledge/tray */}
+          {/* Chalk tray */}
           <div
-            className="absolute bottom-0 left-0 right-0 h-9"
+            className="absolute bottom-0 left-0 right-0 h-8"
             style={{
               background: `linear-gradient(180deg,
-                #6B5344 0%,
-                #5C4033 25%,
-                #4A3728 55%,
-                #3D2B1F 80%,
-                #2D1F15 100%
+                #5a4030 0%,
+                #4a3528 30%,
+                #3a2a1f 70%,
+                #2a1f15 100%
               )`,
               boxShadow: `
-                inset 0 2px 4px rgba(255,255,255,0.1),
-                inset 0 -2px 6px rgba(0,0,0,0.35)
+                inset 0 2px 3px rgba(255,255,255,0.08),
+                inset 0 -2px 4px rgba(0,0,0,0.3)
               `,
             }}
           >
-            {/* Wood grain lines */}
+            {/* Tray edge highlight */}
             <div
-              className="absolute inset-0 opacity-15"
-              style={{
-                backgroundImage: `repeating-linear-gradient(90deg,
-                  transparent 0px,
-                  transparent 18px,
-                  rgba(0,0,0,0.15) 18px,
-                  rgba(0,0,0,0.15) 19px
-                )`,
-              }}
-            />
-            {/* Highlight edge */}
-            <div
-              className="absolute inset-x-0 top-0 h-1"
-              style={{
-                background: 'linear-gradient(180deg, rgba(245,245,240,0.15) 0%, rgba(245,245,240,0.03) 100%)',
-              }}
+              className="absolute top-0 left-0 right-0 h-px"
+              style={{ background: 'rgba(255,255,255,0.12)' }}
             />
 
-            {/* Extra chalk pieces on ledge */}
+            {/* Chalk pieces on tray */}
             <div
-              className="absolute bottom-1.5 right-16 w-2 h-7 rounded-full opacity-65"
+              className="absolute bottom-1 right-12 w-2 h-6 rounded-full opacity-60"
               style={{
-                background: 'linear-gradient(90deg, #E0E0D8 0%, #F0F0E8 50%, #E0E0D8 100%)',
-                transform: 'rotate(15deg)',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.25)',
+                background: 'linear-gradient(90deg, #e0e0d8 0%, #f0f0e8 50%, #e0e0d8 100%)',
+                transform: 'rotate(10deg)',
               }}
             />
             <div
-              className="absolute bottom-1.5 right-28 w-1.5 h-4 rounded-full opacity-45"
+              className="absolute bottom-1.5 right-24 w-1.5 h-4 rounded-full opacity-40"
               style={{
-                background: 'linear-gradient(90deg, #F5E8A8 0%, #FFF8C8 50%, #F5E8A8 100%)',
-                transform: 'rotate(-10deg)',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.25)',
-              }}
-            />
-            <div
-              className="absolute bottom-1.5 left-12 w-1 h-2.5 rounded-full opacity-35"
-              style={{
-                background: 'linear-gradient(90deg, #C8D8C8 0%, #E0F0E0 50%, #C8D8C8 100%)',
-                transform: 'rotate(20deg)',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.25)',
+                background: 'linear-gradient(90deg, #f0e8a0 0%, #fff8c0 50%, #f0e8a0 100%)',
+                transform: 'rotate(-5deg)',
               }}
             />
           </div>
         </div>
 
-        {/* Theorem information */}
+        {/* Theorem info */}
         <div
           ref={infoRef}
           className="text-center mt-10 space-y-1"
           style={{
-            opacity: animationPhase === 'complete' ? 1 : 0.3,
+            opacity: animationPhase === 'complete' ? 1 : 0.4,
             transition: 'opacity 0.8s ease-out',
           }}
         />
@@ -477,12 +425,9 @@ export default function ChalkboardHero() {
         <div className="flex justify-center mt-14 animate-float">
           <div className="flex flex-col items-center gap-3 text-brass-tarnished hover:text-gold transition-colors duration-300 cursor-pointer">
             <span className="text-xs tracking-[0.2em] uppercase font-body">Scroll to explore</span>
-            <div className="relative">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-              </svg>
-              <div className="absolute -left-4 -right-4 top-1/2 h-px bg-gradient-to-r from-transparent via-brass-tarnished/30 to-transparent" />
-            </div>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
           </div>
         </div>
       </div>
