@@ -9,7 +9,21 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // ─── Primary Palette: Warm Library Tones ───
+        // ═══════════════════════════════════════════════════════════════════
+        // PRIMARY: EUCLIDEAN SAGE GREEN - The signature scholarly color
+        // ═══════════════════════════════════════════════════════════════════
+        sage: {
+          DEFAULT: '#3A4A3A',      // Primary sage
+          primary: '#3A4A3A',
+          deep: '#2A3A2A',
+          deepest: '#1A2A1A',
+          light: '#4A5A4A',
+          muted: '#5A6B5A',
+          bright: '#6A7B6A',
+          pale: '#8A9B8A',
+        },
+
+        // ─── Secondary: Warm Wood Accents ───
         walnut: {
           DEFAULT: '#2D1810',
           deep: '#1A0F0A',
@@ -30,16 +44,19 @@ const config: Config = {
         parchment: {
           DEFAULT: '#E8DCC4',
           aged: '#D4C4A8',
+          dark: '#C4B498',
           light: '#F5EFE0',
         },
         vellum: '#F5EFE0',
         ivory: '#FFFEF7',
         sepia: '#704214',
+        cream: '#F5F1E6',
 
         // ─── Metallic Accents ───
         gold: {
           DEFAULT: '#C9A227',
           leaf: '#D4AF37',
+          bright: '#E4BF47',
           dark: '#B89217',
         },
         brass: {
@@ -47,34 +64,43 @@ const config: Config = {
           tarnished: '#6B5344',
           polished: '#A08565',
         },
-        copper: '#B87333',
+        copper: {
+          DEFAULT: '#B87333',
+          verdigris: '#4A8B6B',
+        },
 
         // ─── Atmospheric Colors ───
         ink: '#1A1612',
         charcoal: '#2C2824',
         shadow: '#0D0906',
 
-        // ─── Chalkboard ───
+        // ─── Chalkboard: Sage-Tinted Slate ───
         slate: {
-          DEFAULT: '#1E2D2F',
-          deep: '#141F20',
-          light: '#2E3D3F',
+          DEFAULT: '#1E2D28',
+          deep: '#141F1A',
+          sage: '#1A2A25',
+          light: '#2E3D38',
         },
         chalk: {
           white: '#F5F5F0',
           yellow: '#F5E6A3',
           pink: '#E8B4B8',
           blue: '#A8C5D8',
+          sage: '#C4D8C4',
         },
 
-        // ─── Accent Colors ───
-        sage: {
-          DEFAULT: '#5A6B5A',
-          light: '#7A8B7A',
-          dark: '#3A4B3A',
+        // ─── Gothic Stone Colors ───
+        stone: {
+          DEFAULT: '#4A4A48',
+          light: '#6A6A68',
+          dark: '#2A2A28',
         },
+        moss: '#3A4B3A',
+
+        // ─── Accent Colors ───
         burgundy: '#722F37',
         forest: '#2D4A3E',
+        navy: '#1A2A3A',
       },
 
       fontFamily: {
@@ -175,12 +201,16 @@ const config: Config = {
 
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-sage': 'linear-gradient(180deg, #3A4A3A 0%, #2A3A2A 50%, #1A2A1A 100%)',
+        'gradient-sage-light': 'linear-gradient(135deg, #4A5A4A 0%, #3A4A3A 100%)',
         'gradient-walnut': 'linear-gradient(180deg, #2D1810 0%, #1A0F0A 100%)',
         'gradient-parchment': 'linear-gradient(135deg, #E8DCC4 0%, #D4C4A8 100%)',
         'gradient-gold': 'linear-gradient(180deg, #D4AF37 0%, #C9A227 50%, #8B7355 100%)',
         'gradient-brass': 'linear-gradient(180deg, #8B7355 0%, #6B5344 100%)',
         'candlelight': 'radial-gradient(ellipse at top, rgba(244, 208, 63, 0.06) 0%, rgba(244, 208, 63, 0.02) 40%, transparent 70%)',
-        'vignette': 'radial-gradient(ellipse at center, transparent 0%, transparent 50%, rgba(13, 9, 6, 0.4) 100%)',
+        'lamplight': 'radial-gradient(ellipse at top, rgba(255, 200, 100, 0.08) 0%, transparent 50%)',
+        'vignette': 'radial-gradient(ellipse at center, transparent 0%, transparent 50%, rgba(26, 42, 26, 0.5) 100%)',
+        'vignette-sage': 'radial-gradient(ellipse at center, transparent 30%, rgba(26, 42, 26, 0.4) 100%)',
       },
 
       borderRadius: {

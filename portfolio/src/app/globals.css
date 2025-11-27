@@ -14,62 +14,88 @@
    ═══════════════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* ─── Primary Palette: Warm Library Tones ─── */
+  /* ═══════════════════════════════════════════════════════════════════════════
+     PRIMARY PALETTE: EUCLIDEAN SAGE GREEN
+     The signature color - a darker, scholarly sage that evokes moss-covered
+     stone, ancient libraries, and the patina of aged copper
+     ═══════════════════════════════════════════════════════════════════════════ */
+  --color-sage-primary: #3A4A3A;
+  --color-sage-deep: #2A3A2A;
+  --color-sage-deepest: #1A2A1A;
+  --color-sage-light: #4A5A4A;
+  --color-sage-muted: #5A6B5A;
+  --color-sage-bright: #6A7B6A;
+
+  /* ─── Secondary: Warm Wood Accents ─── */
   --color-walnut: #2D1810;
   --color-walnut-deep: #1A0F0A;
   --color-mahogany: #4A2C2A;
   --color-oak: #5C4033;
-  --color-oak-light: #8B6914;
+  --color-oak-light: #7C6053;
 
   /* ─── Parchment & Paper ─── */
   --color-parchment: #E8DCC4;
   --color-parchment-aged: #D4C4A8;
+  --color-parchment-dark: #C4B498;
   --color-vellum: #F5EFE0;
   --color-ivory: #FFFEF7;
   --color-sepia: #704214;
+  --color-cream: #F5F1E6;
 
   /* ─── Metallic Accents ─── */
   --color-gold: #C9A227;
   --color-gold-leaf: #D4AF37;
+  --color-gold-bright: #E4BF47;
   --color-brass: #8B7355;
   --color-brass-tarnished: #6B5344;
   --color-copper: #B87333;
+  --color-copper-verdigris: #4A8B6B;
 
   /* ─── Atmospheric Colors ─── */
-  --color-candlelight: rgba(244, 208, 63, 0.15);
+  --color-candlelight: rgba(244, 208, 63, 0.12);
   --color-candleglow: #F4D03F;
+  --color-lamplight: rgba(255, 200, 100, 0.08);
   --color-shadow: #0D0906;
   --color-ink: #1A1612;
   --color-charcoal: #2C2824;
 
-  /* ─── Chalkboard ─── */
-  --color-slate: #1E2D2F;
-  --color-slate-deep: #141F20;
+  /* ─── Chalkboard: Sage-Tinted Slate ─── */
+  --color-slate: #1E2D28;
+  --color-slate-deep: #141F1A;
+  --color-slate-sage: #1A2A25;
   --color-chalk-white: #F5F5F0;
   --color-chalk-yellow: #F5E6A3;
   --color-chalk-pink: #E8B4B8;
   --color-chalk-blue: #A8C5D8;
+  --color-chalk-sage: #C4D8C4;
+
+  /* ─── Gothic Stone Colors ─── */
+  --color-stone: #4A4A48;
+  --color-stone-light: #6A6A68;
+  --color-stone-dark: #2A2A28;
+  --color-moss: #3A4B3A;
 
   /* ─── Accent Colors ─── */
-  --color-sage: #5A6B5A;
   --color-burgundy: #722F37;
   --color-forest: #2D4A3E;
+  --color-navy: #1A2A3A;
 
   /* ─── Shadows & Depth ─── */
-  --shadow-ambient: 0 0 100px 50px rgba(244, 208, 63, 0.03);
+  --shadow-ambient: 0 0 100px 50px rgba(58, 74, 58, 0.08);
+  --shadow-sage-glow: 0 0 40px rgba(58, 74, 58, 0.15);
   --shadow-card:
-    0 4px 6px rgba(13, 9, 6, 0.15),
-    0 10px 20px rgba(13, 9, 6, 0.1),
-    0 1px 3px rgba(13, 9, 6, 0.2);
+    0 4px 6px rgba(26, 42, 26, 0.2),
+    0 10px 20px rgba(26, 42, 26, 0.15),
+    0 1px 3px rgba(26, 42, 26, 0.25);
   --shadow-card-hover:
-    0 8px 16px rgba(13, 9, 6, 0.2),
-    0 20px 40px rgba(13, 9, 6, 0.15),
-    0 2px 6px rgba(13, 9, 6, 0.25);
+    0 8px 16px rgba(26, 42, 26, 0.25),
+    0 20px 40px rgba(26, 42, 26, 0.2),
+    0 2px 6px rgba(26, 42, 26, 0.3);
   --shadow-elevated:
-    0 25px 50px rgba(13, 9, 6, 0.3),
-    0 10px 20px rgba(13, 9, 6, 0.2);
+    0 25px 50px rgba(26, 42, 26, 0.35),
+    0 10px 20px rgba(26, 42, 26, 0.25);
   --shadow-inset: inset 0 2px 4px rgba(0, 0, 0, 0.2);
-  --shadow-vignette: inset 0 0 150px rgba(13, 9, 6, 0.4);
+  --shadow-vignette: inset 0 0 150px rgba(26, 42, 26, 0.5);
 
   /* ─── Transitions ─── */
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -78,8 +104,8 @@
   --transition-spring: 600ms cubic-bezier(0.34, 1.56, 0.64, 1);
   --transition-weighted: 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
-  /* ─── Page Variables ─── */
-  --background: var(--color-walnut);
+  /* ─── Page Variables: Sage Green Primary ─── */
+  --background: var(--color-sage-deep);
   --foreground: var(--color-parchment);
 }
 
@@ -93,7 +119,7 @@
 
 html {
   scroll-behavior: smooth;
-  background: var(--color-walnut-deep);
+  background: var(--color-sage-deepest);
 }
 
 body {

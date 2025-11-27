@@ -1,39 +1,12 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { featuredTheorems } from '@/lib/theorems';
 
-// Mathematical theorems with their SVG path data for realistic chalk writing
-const theorems = [
-  {
-    id: 'euler',
-    name: "Euler's Identity",
-    description: 'The most beautiful equation in mathematics',
-    // Simplified text representation - actual SVG paths would be complex
-    text: 'e^(i*pi) + 1 = 0',
-    duration: 4000,
-  },
-  {
-    id: 'pythagorean',
-    name: 'Pythagorean Theorem',
-    description: 'Foundation of Euclidean geometry',
-    text: 'a^2 + b^2 = c^2',
-    duration: 3500,
-  },
-  {
-    id: 'quadratic',
-    name: 'Quadratic Formula',
-    description: 'Solution to polynomial equations',
-    text: 'x = (-b +/- sqrt(b^2-4ac)) / 2a',
-    duration: 5000,
-  },
-  {
-    id: 'gaussian',
-    name: 'Gaussian Integral',
-    description: 'The most important integral in mathematics',
-    text: 'integral(-inf to inf) e^(-x^2) dx = sqrt(pi)',
-    duration: 5500,
-  },
-];
+// ═══════════════════════════════════════════════════════════════════════════════
+// CHALKBOARD HERO - Self-Writing Mathematical Proofs
+// Features realistic chalk physics, dust particles, and Hagoromo-style chalk
+// ═══════════════════════════════════════════════════════════════════════════════
 
 interface ChalkParticle {
   x: number;
@@ -43,40 +16,62 @@ interface ChalkParticle {
   size: number;
   opacity: number;
   life: number;
+  color: string;
 }
+
+interface ChalkDust {
+  x: number;
+  y: number;
+  opacity: number;
+}
+
+// Chalk colors inspired by Hagoromo
+const CHALK_COLORS = {
+  white: { main: '#F5F5F0', glow: 'rgba(245, 245, 240, 0.4)' },
+  yellow: { main: '#F5E6A3', glow: 'rgba(245, 230, 163, 0.4)' },
+  sage: { main: '#C4D8C4', glow: 'rgba(196, 216, 196, 0.4)' },
+};
 
 export default function ChalkboardHero() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const particlesRef = useRef<ChalkParticle[]>([]);
+  const dustRef = useRef<ChalkDust[]>([]);
   const animationRef = useRef<number>(0);
-  const [theorem, setTheorem] = useState(theorems[0]);
-  const [isWriting, setIsWriting] = useState(true);
-  const [chalkPos, setChalkPos] = useState({ x: 0, y: 0, angle: -30, visible: true });
+  const [theorem, setTheorem] = useState(featuredTheorems[0]);
+  const [writingState, setWritingState] = useState<'idle' | 'writing' | 'complete'>('idle');
+  const [chalkPos, setChalkPos] = useState({ x: 100, y: 200, angle: -30, visible: false });
+  const [mounted, setMounted] = useState(false);
 
-  // Select random theorem on mount
+  // Select random featured theorem on mount
   useEffect(() => {
-    const randomTheorem = theorems[Math.floor(Math.random() * theorems.length)];
+    setMounted(true);
+    const randomTheorem = featuredTheorems[Math.floor(Math.random() * featuredTheorems.length)];
     setTheorem(randomTheorem);
   }, []);
 
-  // Chalk brush with realistic bristle effect
+  // ─────────────────────────────────────────────────────────────────────────────
+  // CHALK PHYSICS ENGINE
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  // Draw realistic chalk bristle effect
   const drawChalkBristles = useCallback((
     ctx: CanvasRenderingContext2D,
     x: number,
     y: number,
-    pressure: number = 1
+    pressure: number = 1,
+    color: typeof CHALK_COLORS.white = CHALK_COLORS.white
   ) => {
-    const bristleCount = 12;
-    const spread = 6 * pressure;
+    const bristleCount = 15 + Math.floor(Math.random() * 5);
+    const spread = 8 * pressure;
 
     for (let i = 0; i < bristleCount; i++) {
-      const angle = (i / bristleCount) * Math.PI * 2;
-      const distance = Math.random() * spread;
-      const offsetX = Math.cos(angle) * distance + (Math.random() - 0.5) * 2;
-      const offsetY = Math.sin(angle) * distance + (Math.random() - 0.5) * 2;
-      const size = (0.5 + Math.random() * 1.5) * pressure;
-      const opacity = (0.3 + Math.random() * 0.5) * pressure;
+      const angle = (i / bristleCount) * Math.PI * 2 + Math.random() * 0.5;
+      const distance = Math.random() * spread * (0.3 + Math.random() * 0.7);
+      const offsetX = Math.cos(angle) * distance + (Math.random() - 0.5) * 3;
+      const offsetY = Math.sin(angle) * distance + (Math.random() - 0.5) * 3;
+      const size = (0.4 + Math.random() * 1.8) * pressure;
+      const opacity = (0.25 + Math.random() * 0.55) * pressure;
 
       ctx.beginPath();
       ctx.arc(x + offsetX, y + offsetY, size, 0, Math.PI * 2);
@@ -84,21 +79,39 @@ export default function ChalkboardHero() {
       ctx.fill();
     }
 
-    // Spawn dust particles occasionally
-    if (Math.random() > 0.85) {
+    // Add smudge effect around the stroke
+    if (Math.random() > 0.7) {
+      ctx.beginPath();
+      ctx.arc(x + (Math.random() - 0.5) * 15, y + (Math.random() - 0.5) * 15, Math.random() * 3 + 1, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(245, 245, 240, ${0.05 + Math.random() * 0.1})`;
+      ctx.fill();
+    }
+
+    // Spawn dust particles
+    if (Math.random() > 0.8) {
       particlesRef.current.push({
         x,
         y,
-        vx: (Math.random() - 0.5) * 1.5,
-        vy: -Math.random() * 1.5 - 0.5,
-        size: Math.random() * 2 + 0.5,
-        opacity: Math.random() * 0.5 + 0.2,
-        life: 80 + Math.random() * 40,
+        vx: (Math.random() - 0.5) * 2,
+        vy: -Math.random() * 2 - 0.5,
+        size: Math.random() * 2.5 + 0.5,
+        opacity: Math.random() * 0.5 + 0.3,
+        life: 100 + Math.random() * 60,
+        color: color.main,
+      });
+    }
+
+    // Accumulate chalk dust on the ledge
+    if (Math.random() > 0.95) {
+      dustRef.current.push({
+        x: x + (Math.random() - 0.5) * 20,
+        y: containerRef.current ? containerRef.current.clientHeight - 32 : 0,
+        opacity: Math.random() * 0.3 + 0.1,
       });
     }
   }, []);
 
-  // Draw chalk stroke between two points
+  // Draw chalk stroke between two points with natural variation
   const drawChalkStroke = useCallback((
     ctx: CanvasRenderingContext2D,
     fromX: number,
@@ -108,41 +121,56 @@ export default function ChalkboardHero() {
     pressure: number = 1
   ) => {
     const dist = Math.hypot(toX - fromX, toY - fromY);
-    const steps = Math.max(Math.ceil(dist / 2), 1);
+    const steps = Math.max(Math.ceil(dist / 1.5), 1);
 
     for (let i = 0; i <= steps; i++) {
       const t = i / steps;
-      const x = fromX + (toX - fromX) * t;
-      const y = fromY + (toY - fromY) * t;
-      // Vary pressure along stroke
-      const strokePressure = pressure * (0.8 + Math.sin(t * Math.PI) * 0.2);
+      // Add natural hand tremor
+      const tremor = Math.sin(t * Math.PI * 6) * 0.3;
+      const x = fromX + (toX - fromX) * t + tremor;
+      const y = fromY + (toY - fromY) * t + tremor * 0.5;
+      // Vary pressure along stroke for realistic effect
+      const strokePressure = pressure * (0.7 + Math.sin(t * Math.PI) * 0.3);
       drawChalkBristles(ctx, x, y, strokePressure);
     }
   }, [drawChalkBristles]);
 
-  // Update and render particles
+  // Update and render floating dust particles
   const updateParticles = useCallback((ctx: CanvasRenderingContext2D) => {
     particlesRef.current = particlesRef.current.filter((p) => {
       p.x += p.vx;
       p.y += p.vy;
-      p.vy += 0.03; // gravity
-      p.vx *= 0.98; // air friction
+      p.vy += 0.025; // subtle gravity
+      p.vx *= 0.985; // air resistance
       p.life--;
-      p.opacity *= 0.97;
+      p.opacity *= 0.975;
 
       if (p.life > 0 && p.opacity > 0.01) {
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(245, 245, 240, ${p.opacity})`;
+        ctx.arc(p.x, p.y, p.size * (p.life / 100), 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(245, 245, 240, ${p.opacity * 0.6})`;
         ctx.fill();
         return true;
       }
       return false;
     });
+
+    // Draw accumulated dust
+    dustRef.current.slice(-50).forEach((d) => {
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, 1 + Math.random(), 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(245, 245, 240, ${d.opacity})`;
+      ctx.fill();
+    });
   }, []);
 
-  // Main animation loop
+  // ─────────────────────────────────────────────────────────────────────────────
+  // MAIN ANIMATION LOOP
+  // ─────────────────────────────────────────────────────────────────────────────
+
   useEffect(() => {
+    if (!mounted) return;
+
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
@@ -163,15 +191,21 @@ export default function ChalkboardHero() {
     resize();
     window.addEventListener('resize', resize);
 
-    // Text properties
-    const text = theorem.text;
-    const fontSize = Math.min(container.clientWidth / 18, 42);
+    // Use the theorem's LaTeX as display text (simplified for canvas)
+    const text = theorem.latex
+      .replace(/\\text\{([^}]+)\}/g, '$1')
+      .replace(/\\\\/g, '')
+      .replace(/\\[a-z]+/g, '')
+      .replace(/[{}]/g, '')
+      .trim();
+
+    const fontSize = Math.min(container.clientWidth / 16, 48);
     ctx.font = `500 ${fontSize}px 'Cormorant Garamond', Georgia, serif`;
 
     const metrics = ctx.measureText(text);
     const textWidth = metrics.width;
     const centerX = container.clientWidth / 2;
-    const centerY = container.clientHeight / 2 - 20;
+    const centerY = container.clientHeight / 2 - 30;
     const startX = centerX - textWidth / 2;
 
     let charIndex = 0;
@@ -186,220 +220,366 @@ export default function ChalkboardHero() {
       charWidths.push(ctx.measureText(text[i]).width);
     }
 
+    // Clear canvas initially
+    ctx.clearRect(0, 0, container.clientWidth, container.clientHeight);
+
     const animate = () => {
-      // Clear only particles area (preserving written text)
-      ctx.fillStyle = 'rgba(20, 31, 32, 0.03)';
+      // Very subtle fade for particle trails
+      ctx.fillStyle = 'rgba(26, 42, 37, 0.02)';
       ctx.fillRect(0, 0, container.clientWidth, container.clientHeight);
 
       // Update particles
       updateParticles(ctx);
 
-      if (isWriting && charIndex < text.length) {
+      if (writingState === 'writing' && charIndex < text.length) {
         const char = text[charIndex];
         const charWidth = charWidths[charIndex];
 
-        // Draw chalk strokes
+        // Calculate stroke position with natural variation
         const strokeX = currentX + charWidth * charProgress;
-        const strokeY = centerY + Math.sin(charProgress * Math.PI) * 2;
+        const wobble = Math.sin(charProgress * Math.PI * 3) * 1.5;
+        const strokeY = centerY + wobble;
 
         if (charProgress > 0) {
-          drawChalkStroke(ctx, lastX, lastY, strokeX, strokeY, 0.9);
+          drawChalkStroke(ctx, lastX, lastY, strokeX, strokeY, 0.85);
         }
 
         lastX = strokeX;
         lastY = strokeY;
 
-        // Update chalk position for visual
+        // Update chalk position
         setChalkPos({
           x: strokeX,
-          y: strokeY - 40,
-          angle: -30 + Math.sin(charProgress * Math.PI * 4) * 5,
+          y: strokeY - 50,
+          angle: -25 + Math.sin(charProgress * Math.PI * 4) * 8,
           visible: true,
         });
 
-        charProgress += 0.08;
+        charProgress += 0.07;
 
         if (charProgress >= 1) {
-          // Complete character - draw with chalk effect
+          // Complete character - draw with chalk texture
           ctx.save();
-          ctx.fillStyle = 'rgba(245, 245, 240, 0.92)';
-          ctx.shadowColor = 'rgba(245, 245, 240, 0.4)';
-          ctx.shadowBlur = 3;
+          ctx.fillStyle = 'rgba(245, 245, 240, 0.9)';
+          ctx.shadowColor = 'rgba(245, 245, 240, 0.3)';
+          ctx.shadowBlur = 4;
           ctx.fillText(char, currentX, centerY);
           ctx.restore();
 
-          currentX += charWidth + (char === ' ' ? 5 : 2);
+          // Add subtle glow
+          ctx.save();
+          ctx.fillStyle = 'rgba(245, 245, 240, 0.1)';
+          ctx.filter = 'blur(3px)';
+          ctx.fillText(char, currentX, centerY);
+          ctx.restore();
+
+          currentX += charWidth + (char === ' ' ? 6 : 2);
           charIndex++;
           charProgress = 0;
           lastX = currentX;
           lastY = centerY;
         }
-      } else if (charIndex >= text.length && isWriting) {
-        // Writing complete - settle chalk
-        setIsWriting(false);
+      } else if (charIndex >= text.length && writingState === 'writing') {
+        // Writing complete - settle chalk on ledge
+        setWritingState('complete');
         setTimeout(() => {
-          setChalkPos(prev => ({
-            ...prev,
-            x: container.clientWidth - 80,
-            y: container.clientHeight - 35,
-            angle: 85,
+          setChalkPos({
+            x: container.clientWidth - 100,
+            y: container.clientHeight - 45,
+            angle: 75,
             visible: true,
-          }));
-        }, 300);
+          });
+        }, 400);
       }
 
-      if (isWriting || particlesRef.current.length > 0) {
+      if (writingState === 'writing' || particlesRef.current.length > 0) {
         animationRef.current = requestAnimationFrame(animate);
       }
     };
 
-    // Start with delay
+    // Start animation after delay
     const timeout = setTimeout(() => {
+      setWritingState('writing');
+      setChalkPos({ x: startX, y: centerY - 50, angle: -30, visible: true });
       animate();
-    }, 800);
+    }, 1200);
 
     return () => {
       window.removeEventListener('resize', resize);
       cancelAnimationFrame(animationRef.current);
       clearTimeout(timeout);
     };
-  }, [theorem, isWriting, drawChalkStroke, updateParticles]);
+  }, [theorem, writingState, mounted, drawChalkStroke, updateParticles]);
+
+  if (!mounted) {
+    return (
+      <section id="hero" className="relative min-h-screen flex items-center justify-center py-20 px-6 bg-sage-deep">
+        <div className="animate-pulse text-parchment-aged">Loading...</div>
+      </section>
+    );
+  }
 
   return (
     <section id="hero" className="relative min-h-screen flex items-center justify-center py-20 px-6">
-      {/* Background atmospheric effect */}
+      {/* Atmospheric warm light gradient */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse at 50% 30%, rgba(244, 208, 63, 0.03) 0%, transparent 50%)',
+          background: `
+            radial-gradient(ellipse at 50% 20%, rgba(201, 162, 39, 0.04) 0%, transparent 50%),
+            radial-gradient(ellipse at 30% 70%, rgba(139, 115, 85, 0.03) 0%, transparent 40%),
+            radial-gradient(ellipse at 70% 80%, rgba(139, 115, 85, 0.02) 0%, transparent 40%)
+          `,
         }}
       />
 
-      <div className="w-full max-w-5xl mx-auto">
+      {/* Sage vignette */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse at center, transparent 40%, rgba(26, 42, 26, 0.3) 100%)',
+        }}
+      />
+
+      <div className="w-full max-w-5xl mx-auto relative z-10">
         {/* Title above chalkboard */}
-        <div className="text-center mb-8 animate-fade-up">
+        <div className="text-center mb-10 animate-fade-up">
           <h1 className="font-heading text-hero text-parchment tracking-wide mb-3">
             John Christopher
           </h1>
-          <p className="font-decorative text-lg text-brass italic">
+          <p className="font-decorative text-xl text-brass italic">
             Mathematics Student
+          </p>
+          <p className="font-body text-sm text-sage-bright mt-2 tracking-wider uppercase">
+            Algebraic Topology • Category Theory • Homotopy Theory
           </p>
         </div>
 
-        {/* Chalkboard container */}
+        {/* Chalkboard container with sage-tinted slate */}
         <div
           ref={containerRef}
           className="relative aspect-video max-w-4xl mx-auto rounded overflow-hidden"
           style={{
-            background: 'linear-gradient(145deg, #1E2D2F 0%, #141F20 50%, #0F1718 100%)',
+            background: `
+              linear-gradient(145deg,
+                #1A2A25 0%,
+                #152520 30%,
+                #101D18 60%,
+                #0C1612 100%
+              )
+            `,
             boxShadow: `
-              inset 0 0 80px rgba(0, 0, 0, 0.4),
+              inset 0 0 100px rgba(0, 0, 0, 0.5),
+              inset 0 0 40px rgba(26, 42, 37, 0.3),
+              0 0 0 8px #4A3728,
               0 0 0 12px #5C4033,
-              0 0 0 14px #8B7355,
-              0 20px 60px rgba(0, 0, 0, 0.5)
+              0 0 0 14px #6B5344,
+              0 25px 80px rgba(0, 0, 0, 0.6),
+              0 10px 30px rgba(0, 0, 0, 0.4)
             `,
           }}
         >
-          {/* Slate texture overlay */}
+          {/* Realistic slate texture overlay */}
           <div
-            className="absolute inset-0 pointer-events-none opacity-20"
+            className="absolute inset-0 pointer-events-none opacity-30"
             style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+              mixBlendMode: 'overlay',
             }}
           />
 
-          {/* Subtle light reflection */}
+          {/* Subtle sage tint */}
           <div
-            className="absolute top-0 left-0 right-0 h-1/3 pointer-events-none"
+            className="absolute inset-0 pointer-events-none"
             style={{
-              background: 'linear-gradient(180deg, rgba(255,255,255,0.02) 0%, transparent 100%)',
+              background: 'radial-gradient(ellipse at 40% 30%, rgba(74, 90, 74, 0.08) 0%, transparent 60%)',
             }}
           />
 
-          {/* Canvas for chalk writing */}
+          {/* Light reflection on top edge */}
+          <div
+            className="absolute top-0 left-0 right-0 h-24 pointer-events-none"
+            style={{
+              background: 'linear-gradient(180deg, rgba(255,255,255,0.015) 0%, transparent 100%)',
+            }}
+          />
+
+          {/* Worn areas - lighter patches */}
+          <div
+            className="absolute pointer-events-none opacity-10"
+            style={{
+              top: '20%',
+              left: '15%',
+              width: '30%',
+              height: '40%',
+              background: 'radial-gradient(ellipse, rgba(255,255,255,0.1) 0%, transparent 70%)',
+            }}
+          />
+
+          {/* Canvas for chalk writing animation */}
           <canvas
             ref={canvasRef}
             className="absolute inset-0 w-full h-full"
           />
 
-          {/* 3D Chalk piece */}
+          {/* Hagoromo-style chalk piece */}
           <div
-            className="absolute transition-all duration-700 ease-weighted pointer-events-none"
+            className="absolute transition-all duration-500 ease-weighted pointer-events-none"
             style={{
               left: chalkPos.x,
               top: chalkPos.y,
-              transform: `rotate(${chalkPos.angle}deg)`,
+              transform: `rotate(${chalkPos.angle}deg) translateX(-50%)`,
               opacity: chalkPos.visible ? 1 : 0,
+              transition: writingState === 'complete' ? 'all 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'all 100ms ease-out',
             }}
           >
             <div className="relative">
-              {/* Chalk body */}
+              {/* Chalk body - cylindrical Hagoromo style */}
               <div
-                className="w-3 h-14 rounded-full"
+                className="w-4 h-16 rounded-full relative overflow-hidden"
                 style={{
-                  background: 'linear-gradient(90deg, #E8E8E0 0%, #F8F8F4 30%, #E8E8E0 70%, #D8D8D0 100%)',
+                  background: `
+                    linear-gradient(90deg,
+                      #D8D8D0 0%,
+                      #F5F5F0 20%,
+                      #FFFFFF 40%,
+                      #F5F5F0 60%,
+                      #E8E8E0 80%,
+                      #D0D0C8 100%
+                    )
+                  `,
                   boxShadow: `
-                    inset 2px 0 4px rgba(255,255,255,0.5),
-                    inset -2px 0 4px rgba(0,0,0,0.1),
-                    0 2px 8px rgba(0,0,0,0.4)
+                    inset 3px 0 6px rgba(255,255,255,0.6),
+                    inset -3px 0 6px rgba(0,0,0,0.15),
+                    0 3px 10px rgba(0,0,0,0.4),
+                    0 1px 3px rgba(0,0,0,0.3)
                   `,
                 }}
               >
-                {/* Worn tip */}
+                {/* Chalk dust texture */}
                 <div
-                  className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2.5 h-3 rounded-b-full"
+                  className="absolute inset-0 opacity-30"
                   style={{
-                    background: 'linear-gradient(180deg, #E8E8E0 0%, #C8C8C0 100%)',
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+                  }}
+                />
+
+                {/* Worn tip at bottom */}
+                <div
+                  className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3.5 h-4 rounded-b-full"
+                  style={{
+                    background: 'linear-gradient(180deg, #E8E8E0 0%, #B8B8B0 100%)',
                   }}
                 />
               </div>
-              {/* Shadow on board */}
+
+              {/* Chalk shadow on board */}
               <div
-                className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-1 rounded-full"
+                className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-6 h-2 rounded-full"
                 style={{
-                  background: 'rgba(0,0,0,0.3)',
-                  filter: 'blur(2px)',
+                  background: 'rgba(0,0,0,0.35)',
+                  filter: 'blur(3px)',
                 }}
               />
             </div>
           </div>
 
-          {/* Chalk ledge */}
+          {/* Ornate wooden chalk ledge */}
           <div
-            className="absolute bottom-0 left-0 right-0 h-8"
+            className="absolute bottom-0 left-0 right-0 h-10"
             style={{
-              background: 'linear-gradient(180deg, #5C4033 0%, #4A3728 40%, #3D2B1F 100%)',
-              boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.1), inset 0 -2px 6px rgba(0,0,0,0.3)',
+              background: `
+                linear-gradient(180deg,
+                  #6B5344 0%,
+                  #5C4033 20%,
+                  #4A3728 50%,
+                  #3D2B1F 80%,
+                  #2D1F15 100%
+                )
+              `,
+              boxShadow: `
+                inset 0 3px 6px rgba(255,255,255,0.12),
+                inset 0 -3px 8px rgba(0,0,0,0.4),
+                0 -2px 4px rgba(0,0,0,0.2)
+              `,
             }}
           >
-            {/* Chalk dust accumulation */}
+            {/* Wood grain texture */}
             <div
-              className="absolute inset-x-0 top-0 h-1"
+              className="absolute inset-0 opacity-20"
               style={{
-                background: 'linear-gradient(180deg, rgba(245,245,240,0.15) 0%, transparent 100%)',
+                backgroundImage: `
+                  repeating-linear-gradient(
+                    90deg,
+                    transparent 0px,
+                    transparent 20px,
+                    rgba(0,0,0,0.1) 20px,
+                    rgba(0,0,0,0.1) 21px
+                  )
+                `,
               }}
             />
-            {/* Scattered chalk pieces */}
-            <div className="absolute bottom-2 right-20 w-2 h-6 rounded-full bg-gradient-to-b from-gray-100 to-gray-300 rotate-12 opacity-60" />
-            <div className="absolute bottom-2 right-32 w-1.5 h-4 rounded-full bg-gradient-to-b from-yellow-100 to-yellow-200 -rotate-6 opacity-50" />
+
+            {/* Chalk dust line on ledge */}
+            <div
+              className="absolute inset-x-0 top-0 h-1.5"
+              style={{
+                background: 'linear-gradient(180deg, rgba(245,245,240,0.2) 0%, rgba(245,245,240,0.05) 100%)',
+              }}
+            />
+
+            {/* Extra chalk pieces on ledge */}
+            <div
+              className="absolute bottom-2 right-24 w-2.5 h-8 rounded-full opacity-70"
+              style={{
+                background: 'linear-gradient(90deg, #E8E8E0 0%, #F8F8F4 50%, #E8E8E0 100%)',
+                transform: 'rotate(15deg)',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+              }}
+            />
+            <div
+              className="absolute bottom-2 right-36 w-2 h-5 rounded-full opacity-50"
+              style={{
+                background: 'linear-gradient(90deg, #F5E6A3 0%, #FFF5C3 50%, #F5E6A3 100%)',
+                transform: 'rotate(-8deg)',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+              }}
+            />
+            <div
+              className="absolute bottom-2 left-20 w-1.5 h-3 rounded-full opacity-40"
+              style={{
+                background: 'linear-gradient(90deg, #C4D8C4 0%, #D8ECD8 50%, #C4D8C4 100%)',
+                transform: 'rotate(25deg)',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+              }}
+            />
           </div>
         </div>
 
-        {/* Theorem info */}
-        <div className="text-center mt-8">
-          <p className="font-heading text-lg text-gold mb-1">{theorem.name}</p>
-          <p className="font-decorative text-sm text-brass-tarnished italic">
+        {/* Theorem information */}
+        <div className="text-center mt-10 space-y-2">
+          <p className="font-heading text-xl text-gold-leaf tracking-wide">{theorem.name}</p>
+          <p className="font-decorative text-sm text-parchment-aged italic max-w-xl mx-auto">
             {theorem.description}
           </p>
+          {theorem.mathematician && (
+            <p className="font-body text-xs text-brass-tarnished tracking-wider">
+              — {theorem.mathematician}, {theorem.year && theorem.year > 0 ? theorem.year : `${Math.abs(theorem.year || 0)} BCE`}
+            </p>
+          )}
         </div>
 
-        {/* Scroll indicator */}
-        <div className="flex justify-center mt-12 animate-float">
-          <div className="flex flex-col items-center gap-2 text-brass-tarnished">
-            <span className="text-xs tracking-widest uppercase">Scroll to explore</span>
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-            </svg>
+        {/* Scroll indicator with Gothic flair */}
+        <div className="flex justify-center mt-14 animate-float">
+          <div className="flex flex-col items-center gap-3 text-brass-tarnished group cursor-pointer hover:text-gold transition-colors duration-300">
+            <span className="text-xs tracking-[0.2em] uppercase font-body">Scroll to explore</span>
+            <div className="relative">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+              </svg>
+              {/* Gothic decorative element */}
+              <div className="absolute -left-4 -right-4 top-1/2 h-px bg-gradient-to-r from-transparent via-brass-tarnished/30 to-transparent" />
+            </div>
           </div>
         </div>
       </div>

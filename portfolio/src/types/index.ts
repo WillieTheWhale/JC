@@ -104,9 +104,13 @@ export interface TheoremPath {
   id: string;
   name: string;
   latex: string;
+  latexFull?: string;
   duration: number;
   path: string;
   description?: string;
+  field?: string;
+  year?: number;
+  mathematician?: string;
 }
 
 // Gothic SVG Component Props

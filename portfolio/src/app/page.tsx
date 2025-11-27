@@ -151,7 +151,7 @@ export default function HomePage() {
       </section>
 
       {/* Research Section */}
-      <section id="research" className="relative py-24 px-6 bg-walnut-deep/50">
+      <section id="research" className="relative py-24 px-6 bg-sage-deepest/70">
         <div className="max-w-5xl mx-auto">
           {/* Section header */}
           <div className="flex items-center gap-6 mb-12">
@@ -301,7 +301,7 @@ export default function HomePage() {
       </section>
 
       {/* Writings Section */}
-      <section id="writings" className="relative py-24 px-6 bg-walnut-deep/50">
+      <section id="writings" className="relative py-24 px-6 bg-sage-deepest/70">
         <div className="max-w-4xl mx-auto">
           {/* Section header */}
           <div className="flex items-center gap-6 mb-12">
