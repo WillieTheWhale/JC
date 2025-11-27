@@ -7,3 +7,5 @@ export { default as FloatingSymbols } from './FloatingSymbols';
 export { default as IlluminatedHeader } from './IlluminatedHeader';
 export { default as DustMotes } from './DustMotes';
 export { default as JournalCard } from './JournalCard';
+export { default as ChalkAnnotation, ChalkMarginNote } from './ChalkAnnotation';
+export { default as ProofDisplay, TheoremHeader } from './ProofDisplay';

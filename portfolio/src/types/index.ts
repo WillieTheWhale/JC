@@ -144,11 +144,13 @@ export interface QuatrefoilProps {
 }
 
 export interface TraceryDividerProps {
-  variant?: 'simple' | 'ornate' | 'geometric';
+  variant?: 'simple' | 'ornate' | 'geometric' | 'mathematical' | 'flowing' | 'cathedral';
   width?: number | string;
   color?: string;
   animate?: boolean;
   className?: string;
+  glowColor?: string;
+  breathe?: boolean;
 }
 
 export interface RoseWindowProps {

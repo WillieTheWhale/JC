@@ -244,3 +244,104 @@ Add to `papers` array in `src/lib/data.ts`.
 6. **Card catalog navigation** transforms to bottom sheet on mobile (breakpoint: 768px).
 
 7. **To add GSAP** for more complex animations, install and configure in client components with `'use client'` directive.
+
+---
+
+## Development Roadmap: Living Chalkboard + Gothic Architectural Depth
+
+### Overview
+Comprehensive enhancement combining two creative directions:
+- **Living Chalkboard**: Expanding chalk aesthetics site-wide
+- **Gothic Architectural Depth**: Making Gothic elements structural, not just decorative
+
+### Phase 1: Chalk Annotation System
+**Files**: `src/components/ui/ChalkAnnotation.tsx`, `globals.css`
+- Contextual chalk hover effects on equations
+- Margin annotations as chalk sketches
+- Underline/circle animations on key terms
+- CSS classes: `.chalk-annotate`, `.chalk-underline`, `.chalk-circle`
+
+### Phase 2: Proof Step Reveals
+**Files**: `src/components/ui/ProofDisplay.tsx`
+- Step-by-step theorem reveal with chalk writing animation
+- "Therefore" (∴) symbol flourish
+- QED box draw animation
+- User-controlled reveal speed
+
+### Phase 3: Enhanced Chalkboard Textures
+**Files**: `globals.css`, new texture classes
+- Green chalkboard variant (`.chalkboard-green`)
+- Slate gray variant (`.chalkboard-slate`)
+- Worn patches showing wood grain
+- Chalk dust accumulation at board bottoms
+
+### Phase 4: Lancet Arch Content Frames
+**Files**: `src/components/gothic/ArchFrame.tsx`
+- Structural arch frames for content sections
+- Stonework texture with depth shadows
+- Multiple sizes for content hierarchy
+- Light shift on hover
+
+### Phase 5: Enhanced Tracery Dividers
+**Files**: `src/components/gothic/TraceryDivider.tsx`
+- Mathematical content-aware patterns
+- Light pass-through effect with colored shadows
+- Complexity indicating section importance
+- Subtle breathing animation
+
+### Phase 6: Flying Buttress Connections
+**Files**: `src/components/gothic/FlyingButtress.tsx`
+- Visual connections between related content
+- Double-arc Gothic form
+- Hover highlights connected content
+- Creates visible knowledge architecture
+
+### Phase 7: Enhanced Rose Window Transitions
+**Files**: `src/components/gothic/RoseWindow.tsx`, transition hooks
+- Page transition effects (expand from center)
+- Petals contain destination preview
+- Mathematical constant rotation during load
+- Lock-into-place completion animation
+
+### Phase 8: Ribbed Vault Scroll Effect
+**Files**: `src/components/layout/RibbedVault.tsx`
+- Subtle parallax ceiling effect on long pages
+- Ribs converge at keystones with math symbols
+- Creates sense of cathedral nave
+- Only appears on pages exceeding viewport height
+
+### Technical Specifications
+- All animations respect `prefers-reduced-motion`
+- SVG draw effects use `stroke-dasharray`/`stroke-dashoffset`
+- Performance: Use `will-change` sparingly, prefer `transform`/`opacity`
+- Mobile: Disable complex parallax, simplify animations
+
+### New UI Components to Create
+| Component | Purpose | Location |
+|-----------|---------|----------|
+| ChalkAnnotation | Hover chalk effects | `ui/` |
+| ProofDisplay | Step-by-step proofs | `ui/` |
+| ArchFrame | Structural content frames | `gothic/` |
+| FlyingButtress | Content connections | `gothic/` |
+| RibbedVault | Scroll parallax | `layout/` |
+
+### CSS Classes to Add
+```css
+/* Chalkboard variants */
+.chalkboard-green { }
+.chalkboard-slate { }
+.chalkboard-worn { }
+
+/* Chalk annotations */
+.chalk-annotate { }
+.chalk-underline { }
+.chalk-circle { }
+.chalk-emphasis { }
+
+/* Gothic structural */
+.arch-frame { }
+.arch-frame-sm { }
+.arch-frame-lg { }
+.buttress-connection { }
+.vault-rib { }
+```

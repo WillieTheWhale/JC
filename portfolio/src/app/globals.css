@@ -267,9 +267,11 @@ code, pre {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════════
-   CHALKBOARD STYLES
+   CHALKBOARD STYLES - Living Chalkboard System
+   Multiple variants: classic dark, green, slate gray, worn
    ═══════════════════════════════════════════════════════════════════════════════════ */
 
+/* Base chalkboard - Dark slate (default) */
 .chalkboard {
   background-color: var(--color-slate-deep);
   position: relative;
@@ -293,7 +295,121 @@ code, pre {
   pointer-events: none;
 }
 
-/* Chalk text styling */
+/* ─── Green Chalkboard - Classic classroom ─── */
+.chalkboard-green {
+  background: linear-gradient(
+    135deg,
+    #1E3A2F 0%,
+    #1A332A 50%,
+    #152D24 100%
+  );
+  position: relative;
+  border-radius: 4px;
+  box-shadow:
+    inset 0 0 80px rgba(0, 0, 0, 0.25),
+    inset 0 0 20px rgba(30, 58, 47, 0.3),
+    0 10px 40px rgba(0, 0, 0, 0.4),
+    0 0 0 8px var(--color-oak),
+    0 0 0 10px var(--color-brass-tarnished);
+}
+
+.chalkboard-green::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  background-image:
+    radial-gradient(ellipse at 25% 15%, rgba(100, 150, 100, 0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 75% 85%, rgba(50, 100, 70, 0.02) 0%, transparent 40%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='greenNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.15 0 0 0 0 0.12 0 0 0 0.12 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23greenNoise)'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+/* ─── Slate Gray Chalkboard - Formal/modern ─── */
+.chalkboard-slate {
+  background: linear-gradient(
+    135deg,
+    #2A2D30 0%,
+    #1E2124 50%,
+    #18191C 100%
+  );
+  position: relative;
+  border-radius: 4px;
+  box-shadow:
+    inset 0 0 70px rgba(0, 0, 0, 0.35),
+    inset 0 0 15px rgba(60, 65, 70, 0.2),
+    0 10px 40px rgba(0, 0, 0, 0.45),
+    0 0 0 6px #3A3D40,
+    0 0 0 8px #2A2D30;
+}
+
+.chalkboard-slate::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  background-image:
+    radial-gradient(ellipse at 20% 20%, rgba(150, 160, 170, 0.02) 0%, transparent 50%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='slateNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.15 0 0 0 0 0.16 0 0 0 0 0.18 0 0 0 0.1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23slateNoise)'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+/* ─── Worn Chalkboard - Aged with character ─── */
+.chalkboard-worn {
+  background: linear-gradient(
+    145deg,
+    #1A2520 0%,
+    #151E1A 40%,
+    #1D2823 70%,
+    #141C18 100%
+  );
+  position: relative;
+  border-radius: 4px;
+  box-shadow:
+    inset 0 0 100px rgba(0, 0, 0, 0.4),
+    inset 0 50px 80px -50px rgba(80, 70, 50, 0.1),
+    0 10px 40px rgba(0, 0, 0, 0.4),
+    0 0 0 8px #4A3828,
+    0 0 0 10px #3A2A1A;
+}
+
+.chalkboard-worn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  background-image:
+    /* Worn patches showing wood grain */
+    radial-gradient(ellipse at 10% 90%, rgba(74, 56, 40, 0.15) 0%, transparent 20%),
+    radial-gradient(ellipse at 95% 5%, rgba(74, 56, 40, 0.1) 0%, transparent 15%),
+    radial-gradient(ellipse at 80% 95%, rgba(74, 56, 40, 0.12) 0%, transparent 18%),
+    /* Eraser smudges */
+    radial-gradient(ellipse at 40% 30%, rgba(200, 200, 190, 0.015) 0%, transparent 25%),
+    radial-gradient(ellipse at 60% 70%, rgba(200, 200, 190, 0.01) 0%, transparent 20%),
+    /* Base texture */
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='wornNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.08 0 0 0 0 0.1 0 0 0 0 0.09 0 0 0 0.15 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23wornNoise)'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+/* Chalk dust accumulation at bottom */
+.chalkboard-worn::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  border-radius: 0 0 4px 4px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(200, 195, 180, 0.02) 50%,
+    rgba(200, 195, 180, 0.04) 100%
+  );
+  pointer-events: none;
+}
+
+/* ─── Chalk text styling ─── */
 .chalk-text {
   color: var(--color-chalk-white);
   text-shadow:
@@ -303,7 +419,14 @@ code, pre {
   font-family: 'Cormorant Garamond', Georgia, serif;
 }
 
-/* Chalk ledge */
+/* Chalk color variants */
+.chalk-white { color: var(--color-chalk-white); text-shadow: 0 0 2px rgba(245,245,240,0.6); }
+.chalk-yellow { color: var(--color-chalk-yellow); text-shadow: 0 0 3px rgba(245,230,163,0.5); }
+.chalk-pink { color: var(--color-chalk-pink); text-shadow: 0 0 3px rgba(232,180,184,0.5); }
+.chalk-blue { color: var(--color-chalk-blue); text-shadow: 0 0 3px rgba(168,197,216,0.5); }
+.chalk-sage { color: var(--color-chalk-sage); text-shadow: 0 0 3px rgba(196,216,196,0.5); }
+
+/* ─── Chalk ledge ─── */
 .chalk-ledge {
   background: linear-gradient(
     180deg,
@@ -315,6 +438,46 @@ code, pre {
     inset 0 2px 4px rgba(255,255,255,0.1),
     inset 0 -2px 4px rgba(0,0,0,0.3),
     0 4px 8px rgba(0,0,0,0.3);
+}
+
+/* ─── Chalk writing animation ─── */
+@keyframes chalkWrite {
+  0% {
+    opacity: 0;
+    filter: blur(2px);
+  }
+  50% {
+    opacity: 0.7;
+    filter: blur(1px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+.animate-chalk-write {
+  animation: chalkWrite 0.4s ease-out forwards;
+}
+
+/* ─── Chalk underline animation ─── */
+@keyframes chalkUnderline {
+  0% {
+    stroke-dashoffset: 100%;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+.chalk-underline-anim {
+  stroke-dasharray: 100%;
+  animation: chalkUnderline 0.5s ease-out forwards;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════════
@@ -616,6 +779,21 @@ code, pre {
 @keyframes rotateSlow {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+@keyframes breathe {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.005);
+  }
+}
+
+.animate-breathe {
+  animation: breathe 8s ease-in-out infinite;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════════
