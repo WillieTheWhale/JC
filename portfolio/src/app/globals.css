@@ -1,0 +1,291 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400&family=Fira+Code:wght@400;500&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap');
+
+/* KaTeX styles */
+@import 'katex/dist/katex.min.css';
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* ROOT VARIABLES - DESIGN SYSTEM                                               */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Colors */
+  --color-sage-primary: #5A6B5A;
+  --color-sage-light: #7A8B7A;
+  --color-sage-dark: #3A4B3A;
+  --color-charcoal: #3C3C3C;
+  --color-white: #FFFFFF;
+  --color-off-white: #F8F8F6;
+  --color-gold: #C4A35A;
+  --color-blackboard: #1A1A1A;
+  --color-chalk: #F5F5F0;
+  --color-cream: #F5F1E6;
+  --color-brass: #B5915A;
+
+  /* Shadows */
+  --shadow-card: 0 4px 20px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.1);
+  --shadow-card-hover: 0 8px 32px rgba(0,0,0,0.2), 0 4px 12px rgba(0,0,0,0.15);
+  --shadow-elevated: 0 12px 48px rgba(0,0,0,0.25);
+  --shadow-button: 0 2px 8px rgba(0,0,0,0.2);
+  --shadow-button-active: 0 1px 4px rgba(0,0,0,0.15);
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 600ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-inertia: 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  /* Spacing */
+  --spacing-section: clamp(4rem, 10vh, 8rem);
+
+  /* Background */
+  --background: var(--color-off-white);
+  --foreground: var(--color-charcoal);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* BASE STYLES                                                                  */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: 'IBM Plex Serif', Georgia, serif;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* TYPOGRAPHY                                                                   */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--color-sage-dark);
+}
+
+code, pre {
+  font-family: 'Fira Code', Consolas, monospace;
+}
+
+.font-decorative {
+  font-family: 'Spectral', Georgia, serif;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* GOTHIC SVG ANIMATIONS                                                        */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+.gothic-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: drawPath 0.8s ease-out forwards;
+}
+
+@keyframes drawPath {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.tracery-symbol {
+  opacity: 0;
+  transform: scale(0.8);
+  filter: blur(4px);
+  transition: all 400ms ease-out 200ms;
+}
+
+.tracery-reveal:hover .tracery-symbol {
+  opacity: 1;
+  transform: scale(1);
+  filter: blur(0);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* BUTTON INTERACTIONS                                                          */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+.btn-typewriter {
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  box-shadow: var(--shadow-button);
+}
+
+.btn-typewriter:active {
+  transform: translateY(3px);
+  box-shadow: var(--shadow-button-active);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* CARD STYLES                                                                  */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+.card-elevate {
+  transition: transform var(--transition-spring), box-shadow var(--transition-base);
+  box-shadow: var(--shadow-card);
+}
+
+.card-elevate:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* CHALKBOARD STYLES                                                            */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+.chalkboard {
+  background-color: var(--color-blackboard);
+  position: relative;
+}
+
+.chalkboard::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.05;
+  pointer-events: none;
+}
+
+.chalk-text {
+  color: var(--color-chalk);
+  text-shadow:
+    0 0 1px rgba(245,245,240,0.5),
+    0 0 2px rgba(245,245,240,0.3);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* PAPER TEXTURES                                                               */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+.paper-aged {
+  background-color: var(--color-cream);
+  position: relative;
+}
+
+.paper-aged::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='5'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* REDUCED MOTION                                                               */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* SCROLLBAR STYLING                                                            */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-off-white);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-sage-light);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-sage-primary);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* FOCUS STYLES (Accessibility)                                                 */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* LOADING ANIMATION                                                            */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+.loading-proof path {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: writeProof 3s ease-in-out forwards;
+}
+
+@keyframes writeProof {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* PAGE TRANSITIONS                                                             */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+.page-enter {
+  opacity: 0;
+  transform: translateX(5%);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 600ms ease-out, transform 600ms ease-out;
+}
+
+.page-exit {
+  opacity: 1;
+}
+
+.page-exit-active {
+  opacity: 0.3;
+  transform: translateX(-5%) scale(0.98);
+  transition: opacity 400ms ease-in, transform 400ms ease-in;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* UTILITIES                                                                    */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animate-stagger > * {
+    animation: fadeUp 0.6s ease-out forwards;
+    opacity: 0;
+  }
+
+  .animate-stagger > *:nth-child(1) { animation-delay: 0ms; }
+  .animate-stagger > *:nth-child(2) { animation-delay: 100ms; }
+  .animate-stagger > *:nth-child(3) { animation-delay: 200ms; }
+  .animate-stagger > *:nth-child(4) { animation-delay: 300ms; }
+  .animate-stagger > *:nth-child(5) { animation-delay: 400ms; }
+  .animate-stagger > *:nth-child(6) { animation-delay: 500ms; }
+}
