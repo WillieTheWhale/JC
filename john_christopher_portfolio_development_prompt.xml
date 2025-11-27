@@ -1,0 +1,1434 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║           JOHN CHRISTOPHER PORTFOLIO WEBSITE DEVELOPMENT PROMPT              ║
+║                                                                              ║
+║   A Comprehensive Multi-Agent Architecture for Building a Dark Academia      ║
+║   Mathematical Portfolio with Gothic Architectural Elements                  ║
+║                                                                              ║
+║   Client: John Christopher (Mathematics Student)                             ║
+║   Style: Mathematical Minimalist meets Gothic Structural Framework           ║
+║   Aesthetic: Dark Academia with Whimsical Scholarly Gravitas                 ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+-->
+
+<development_prompt version="1.0" project="john-christopher-portfolio">
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- SECTION 1: GLOBAL PROJECT CONTEXT                                       -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  
+  <project_context>
+    <overview>
+      <client_name>John Christopher</client_name>
+      <profession>Mathematics Student</profession>
+      <project_type>Personal Portfolio Website</project_type>
+      <deployment_target>GitHub Pages (Static Site)</deployment_target>
+      <primary_goal>
+        Create a highly memorable, technically impressive portfolio that authentically 
+        represents John's identity as a mathematician while balancing scholarly gravitas 
+        with playful intellectualism. The site must stand out from generic academic 
+        portfolios through creative Gothic architectural integration, sophisticated 
+        animations, and interactive mathematical elements.
+      </primary_goal>
+    </overview>
+
+    <aesthetic_pillars>
+      <pillar id="1" name="Mathematical Minimalist">
+        <description>
+          High-contrast, euclidean clarity emphasizing mathematical precision.
+          Clean lines, purposeful negative space, and rigorous visual hierarchy.
+        </description>
+        <color_palette>
+          <primary name="Euclidean Sage" hex="#5A6B5A" rgb="90,107,90"/>
+          <secondary name="Charcoal" hex="#3C3C3C" rgb="60,60,60"/>
+          <tertiary name="Pure White" hex="#FFFFFF" rgb="255,255,255"/>
+          <accent name="Gold Leaf" hex="#C4A35A" rgb="196,163,90"/>
+          <blackboard name="True Black" hex="#1A1A1A" rgb="26,26,26"/>
+          <chalk name="Warm White" hex="#F5F5F0" rgb="245,245,240"/>
+        </color_palette>
+      </pillar>
+      
+      <pillar id="2" name="Gothic Structural Framework">
+        <description>
+          Gothic arches form the literal structure of the website. Section dividers 
+          as decorative tracery, card containers with ogive frames, navigation within 
+          cusped arch frames, and architectural elements integrated into functional 
+          UI components.
+        </description>
+        <architectural_elements>
+          <element type="lancet_arch">Primary navigation frames</element>
+          <element type="trefoil">Decorative section endings</element>
+          <element type="quatrefoil">Card corners and badges</element>
+          <element type="tracery">Section dividers and backgrounds</element>
+          <element type="flying_buttress">Footer silhouettes</element>
+          <element type="rose_window">Loading states and special elements</element>
+        </architectural_elements>
+      </pillar>
+      
+      <pillar id="3" name="Dark Academia Atmosphere">
+        <description>
+          Inspired by the Trinity College Long Room library - warm wood tones, 
+          scholarly depth, classical learning environment with modern mathematical 
+          rigor. Atmosphere of late-night study sessions, discovery, and intellectual 
+          pursuit.
+        </description>
+      </pillar>
+    </aesthetic_pillars>
+
+    <typography_system name="Modern Scholarly">
+      <font_stack>
+        <headings font="Cormorant Garamond" fallback="Georgia, serif" weights="400,500,600,700"/>
+        <body font="IBM Plex Serif" fallback="Georgia, serif" weights="400,500"/>
+        <mathematics engine="KaTeX" fallback="MathJax"/>
+        <code font="Fira Code" fallback="Consolas, monospace" features="ligatures"/>
+        <decorative font="Spectral" fallback="Georgia, serif"/>
+      </font_stack>
+      
+      <fluid_typography>
+        <size name="hero" formula="clamp(2.5rem, 5vw, 4.5rem)"/>
+        <size name="h1" formula="clamp(2rem, 4vw, 3.5rem)"/>
+        <size name="h2" formula="clamp(1.5rem, 3vw, 2.5rem)"/>
+        <size name="h3" formula="clamp(1.25rem, 2.5vw, 2rem)"/>
+        <size name="body" formula="clamp(1rem, 1.125rem, 1.25rem)"/>
+      </fluid_typography>
+    </typography_system>
+
+    <technical_stack>
+      <framework>Next.js 14+ (App Router)</framework>
+      <styling>Tailwind CSS with custom design tokens</styling>
+      <animations>
+        <primary>GSAP with InertiaPlugin, Physics2DPlugin, DrawSVGPlugin</primary>
+        <secondary>Framer Motion for React components</secondary>
+        <svg>Native CSS animations with stroke-dasharray/dashoffset</svg>
+      </animations>
+      <graphics_3d>Three.js for Hagoromo chalk sprite</graphics_3d>
+      <canvas>HTML5 Canvas 2D for interactive chalkboard</canvas>
+      <math_rendering>KaTeX with auto-render extension</math_rendering>
+      <api_integration>Gemini API for LaTeX transcription</api_integration>
+      <deployment>GitHub Pages via GitHub Actions</deployment>
+    </technical_stack>
+  </project_context>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- SECTION 2: DESIGN SYSTEM                                                -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  
+  <design_system>
+    <css_variables>
+      <colors>
+        <var name="--color-sage-primary">#5A6B5A</var>
+        <var name="--color-sage-light">#7A8B7A</var>
+        <var name="--color-sage-dark">#3A4B3A</var>
+        <var name="--color-charcoal">#3C3C3C</var>
+        <var name="--color-white">#FFFFFF</var>
+        <var name="--color-off-white">#F8F8F6</var>
+        <var name="--color-gold">#C4A35A</var>
+        <var name="--color-blackboard">#1A1A1A</var>
+        <var name="--color-chalk">#F5F5F0</var>
+      </colors>
+      
+      <shadows>
+        <var name="--shadow-card">0 4px 20px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.1)</var>
+        <var name="--shadow-card-hover">0 8px 32px rgba(0,0,0,0.2), 0 4px 12px rgba(0,0,0,0.15)</var>
+        <var name="--shadow-elevated">0 12px 48px rgba(0,0,0,0.25)</var>
+      </shadows>
+      
+      <transitions>
+        <var name="--transition-fast">150ms cubic-bezier(0.4, 0, 0.2, 1)</var>
+        <var name="--transition-base">300ms cubic-bezier(0.4, 0, 0.2, 1)</var>
+        <var name="--transition-spring">600ms cubic-bezier(0.34, 1.56, 0.64, 1)</var>
+        <var name="--transition-inertia">800ms cubic-bezier(0.25, 0.46, 0.45, 0.94)</var>
+      </transitions>
+    </css_variables>
+
+    <gothic_svg_components>
+      <component name="LancetArch" usage="Navigation frames, card borders">
+        <geometry>Two arcs meeting at pointed apex, optional cusping</geometry>
+        <animation>stroke-dasharray draw-in, 0.8s duration</animation>
+      </component>
+      
+      <component name="Trefoil" usage="Decorative accents, section endings">
+        <geometry>Three overlapping circles in clover pattern at 120° intervals</geometry>
+        <animation>Fade-in with rotation on scroll-into-view</animation>
+        <easter_egg>Hidden mathematical symbols reveal on hover</easter_egg>
+      </component>
+      
+      <component name="Quatrefoil" usage="Card badges, corner decorations">
+        <geometry>Four overlapping circles in cruciform pattern</geometry>
+        <animation>Scale-in from center on hover</animation>
+        <easter_egg>Hidden symbols: φ, π, e, ∞</easter_egg>
+      </component>
+      
+      <component name="TraceryDivider" usage="Section breaks">
+        <variants>simple (lancet repeat), ornate (cusped with trefoils), geometric (bar tracery)</variants>
+        <animation>Draw from center outward, 1.2s duration</animation>
+      </component>
+      
+      <component name="RoseWindow" usage="Loading states, hero elements">
+        <geometry>Central quatrefoil, 8-12 radial petals, outer cusped ring</geometry>
+        <animation>Continuous slow rotation (60s cycle)</animation>
+      </component>
+    </gothic_svg_components>
+  </design_system>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- SECTION 3: MICRO-INTERACTIONS                                           -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  
+  <micro_interactions>
+    <philosophy>
+      Every interaction should feel weighted and intentional, as if manipulating 
+      physical objects in an ancient library. Buttons have mechanical resistance, 
+      pages turn with momentum, elements respond to physics.
+    </philosophy>
+
+    <interaction name="double-click-chalk-dust">
+      <trigger>Double-click on chalkboard elements</trigger>
+      <effect>
+        Burst of 20-40 chalk dust particles from click point.
+        Particles use Physics2D for realistic drift with slight upward bias.
+        Color: rgba(245,245,240,0.6), fade over 1.5 seconds.
+      </effect>
+      <gsap_implementation>
+        gsap.to(particle, {
+          physics2D: { velocity: random(50,100), angle: random(360), gravity: 50, friction: 0.1 },
+          opacity: 0, duration: 2, onComplete: () => particle.remove()
+        });
+      </gsap_implementation>
+    </interaction>
+
+    <interaction name="gothic-tracery-symbol-reveal">
+      <trigger>Hover over .tracery-reveal elements</trigger>
+      <effect>
+        Hidden mathematical symbols fade into view within Gothic tracery patterns.
+        Examples: Euler's identity in quatrefoil, golden ratio in spiral, infinity in arches.
+      </effect>
+      <css>
+        .tracery-symbol { opacity: 0; transform: scale(0.8); filter: blur(4px); transition: all 400ms ease-out 200ms; }
+        .tracery-reveal:hover .tracery-symbol { opacity: 1; transform: scale(1); filter: blur(0); }
+      </css>
+    </interaction>
+
+    <interaction name="typewriter-button-depress">
+      <trigger>Click/tap on buttons</trigger>
+      <effect>
+        Button physically depresses like typewriter key:
+        - translateY(3px) on mousedown with shadow reduction
+        - Spring back on mouseup with slight overshoot
+      </effect>
+      <css>
+        .button:active { transform: translateY(3px); box-shadow: var(--shadow-button-active); }
+      </css>
+      <gsap_release>
+        gsap.to(button, { y: 0, duration: 0.4, ease: "elastic.out(1, 0.5)" });
+      </gsap_release>
+    </interaction>
+
+    <interaction name="page-transition-weight">
+      <trigger>Navigation between pages</trigger>
+      <effect>
+        Pages feel like heavy manuscript pages turning:
+        - Current content slides out with deceleration (weighted feel)
+        - New content slides in with overshoot then settle
+        - Gothic arch mask clips transition edges
+      </effect>
+      <gsap_timeline>
+        timeline.to(currentPage, { x: "-5%", opacity: 0.3, scale: 0.98, duration: 0.4, ease: "power2.in" })
+        .fromTo(newPage, { x: "5%", opacity: 0 }, { x: "0%", opacity: 1, duration: 0.6, ease: "power2.out" }, "-=0.2");
+      </gsap_timeline>
+    </interaction>
+
+    <interaction name="card-elevation-shadows">
+      <trigger>Hover over card components</trigger>
+      <effect>
+        Cards cast realistic shadows responding to elevation:
+        - Shadow expands and softens as card "rises"
+        - translateY(-4px) completes elevation illusion
+        - Shadow offset shifts as if light source is fixed
+      </effect>
+      <css>
+        .card { box-shadow: var(--shadow-card); transition: box-shadow var(--transition-base), transform var(--transition-spring); }
+        .card:hover { box-shadow: var(--shadow-card-hover); transform: translateY(-4px); }
+      </css>
+    </interaction>
+
+    <interaction name="mobile-shake-clear">
+      <trigger>Device shake gesture (interactive chalkboard)</trigger>
+      <effect>
+        Shaking clears chalkboard with eraser sweep animation.
+        Shake threshold: 15 (acceleration delta).
+        Eraser SVG sweeps left to right, dust cloud follows.
+      </effect>
+      <detection>
+        window.addEventListener('devicemotion', (e) => {
+          let delta = Math.abs(lastX - e.accelerationIncludingGravity.x) + Math.abs(lastY - e.accelerationIncludingGravity.y);
+          if (delta > 15) triggerEraserAnimation();
+        });
+      </detection>
+    </interaction>
+
+    <interaction name="loading-proof-animation">
+      <trigger>Page load, route changes, async loading</trigger>
+      <effect>
+        Loading states show famous proofs writing themselves:
+        Random selection from library, chalk SVG path animation.
+      </effect>
+      <proof_library>
+        <proof latex="e^{i\pi} + 1 = 0" duration="8s"/>
+        <proof latex="a^2 + b^2 = c^2" duration="6s"/>
+        <proof latex="x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}" duration="12s"/>
+        <proof latex="\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}" duration="15s"/>
+        <proof latex="f(a) = \frac{1}{2\pi i} \oint_\gamma \frac{f(z)}{z-a} dz" duration="18s"/>
+      </proof_library>
+    </interaction>
+  </micro_interactions>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- SECTION 4: SUB-AGENT DEFINITIONS                                        -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  
+  <sub_agents>
+
+    <!-- ═════════════════════════════════════════════════════════════════════ -->
+    <!-- AGENT 1: PROJECT ARCHITECT                                            -->
+    <!-- ═════════════════════════════════════════════════════════════════════ -->
+    
+    <agent id="1" name="Project Architect" role="Foundation and Structure">
+      <purpose>
+        Establish complete project architecture, file structure, build configuration, 
+        and foundational code that all other agents build upon.
+      </purpose>
+      
+      <tasks>
+        <task priority="critical">Initialize Next.js 14 project with App Router</task>
+        <task priority="critical">Configure Tailwind CSS with custom design tokens</task>
+        <task priority="critical">Set up GSAP with premium plugins (Inertia, Physics2D, DrawSVG)</task>
+        <task priority="high">Create base layout with Gothic arch structural frames</task>
+        <task priority="high">Configure KaTeX for mathematics rendering</task>
+        <task priority="high">Set up GitHub Actions for GitHub Pages deployment</task>
+        <task priority="medium">Create shared TypeScript types and interfaces</task>
+      </tasks>
+
+      <file_structure>
+john-christopher-portfolio/
+├── .github/workflows/deploy.yml
+├── public/
+│   ├── fonts/ (Cormorant, IBM Plex, Fira Code, Spectral)
+│   ├── svg/arches/, svg/tracery/, svg/ornaments/
+│   └── cv/john-christopher-cv.pdf
+├── src/
+│   ├── app/
+│   │   ├── layout.tsx, page.tsx, globals.css
+│   │   ├── cv/page.tsx
+│   │   ├── projects/page.tsx
+│   │   ├── research/page.tsx
+│   │   ├── chalkboard/page.tsx
+│   │   └── blog/page.tsx, blog/[slug]/page.tsx
+│   ├── components/
+│   │   ├── layout/ (Navigation, Header, Footer, GothicFrame)
+│   │   ├── ui/ (Button, Card, LoadingProof, TraceryDivider)
+│   │   ├── chalkboard/ (ChalkboardCanvas, ChalkSprite, AutoWriting, Particles)
+│   │   ├── blog/ (CoffeeTableCard, MathPostRenderer)
+│   │   └── gothic/ (LancetArch, Trefoil, Quatrefoil, RoseWindow)
+│   ├── hooks/ (useGSAP, useChalkboard, useShakeDetection)
+│   ├── lib/ (gsap-config, gemini, katex-config, theorems)
+│   └── types/index.ts
+├── content/blog/, content/projects/
+├── tailwind.config.ts, next.config.js, tsconfig.json
+      </file_structure>
+
+      <tailwind_config>
+        Extend theme with:
+        - Custom colors (sage scale, charcoal, gold, blackboard, chalk)
+        - Custom fonts (heading, body, code, decorative)
+        - Fluid font sizes using clamp()
+        - Custom shadows (card, card-hover, elevated)
+        - Custom easings (spring, inertia)
+        - Custom keyframes (drawIn, fadeUp, rotateSlow, chalkWrite)
+      </tailwind_config>
+
+      <gsap_setup>
+        Register plugins: ScrollTrigger, DrawSVGPlugin, InertiaPlugin, Physics2DPlugin
+        Set defaults: ease "power2.out", duration 0.6
+        Register custom eases: "typewriter", "pageWeight"
+      </gsap_setup>
+
+      <validation>
+        - Next.js builds without errors
+        - Custom fonts load correctly
+        - Tailwind classes apply design tokens
+        - GSAP plugins register and function
+        - KaTeX renders test equations
+        - GitHub Pages deployment succeeds
+      </validation>
+    </agent>
+
+    <!-- ═════════════════════════════════════════════════════════════════════ -->
+    <!-- AGENT 2: GOTHIC ARCHITECTURE ENGINEER                                 -->
+    <!-- ═════════════════════════════════════════════════════════════════════ -->
+    
+    <agent id="2" name="Gothic Architecture Engineer" role="SVG and Structural Elements">
+      <purpose>
+        Create all Gothic architectural SVG elements as React components with 
+        proper animations and hidden mathematical Easter eggs.
+      </purpose>
+      
+      <tasks>
+        <task priority="critical">Design SVG lancet arch for navigation frames</task>
+        <task priority="critical">Create trefoil and quatrefoil decorative elements</task>
+        <task priority="critical">Build tracery divider components</task>
+        <task priority="high">Implement rose window for loading states</task>
+        <task priority="high">Create GothicFrame wrapper component</task>
+        <task priority="medium">Implement hidden math symbols in tracery (Easter eggs)</task>
+      </tasks>
+
+      <svg_requirements>
+        - All paths must have pathLength="1" for consistent animation
+        - Use stroke-dasharray/dashoffset for draw animations
+        - Include proper viewBox for responsive scaling
+        - Optimize paths with SVGO
+        - Group related paths for coordinated animations
+      </svg_requirements>
+
+      <components>
+        <LancetArch props="width, height, strokeColor, strokeWidth, animate, delay, children">
+          Pointed arch geometry: two arcs meeting at apex
+          Path: M 0,height A width,width 0 0,1 width/2,0 A width,width 0 0,1 width,height
+        </LancetArch>
+        
+        <Trefoil props="size, color, filled, animate, hiddenSymbol">
+          Three circles radius r=size/3, centers at 120° intervals
+          Hidden symbol fades in on hover (π, ∫, ∂)
+        </Trefoil>
+        
+        <Quatrefoil props="size, color, filled, rounded, hiddenSymbol">
+          Four circles radius r=size/4, centers at 90° intervals
+          Hidden symbol: φ (golden ratio)
+        </Quatrefoil>
+        
+        <TraceryDivider props="variant (simple|ornate|geometric), width, color, animate">
+          simple: Repeating lancet arch pattern
+          ornate: Cusped arches with trefoils in spandrels
+          geometric: Interlocking circles (bar tracery)
+        </TraceryDivider>
+        
+        <RoseWindow props="size, petals, color, spinning, spinDuration">
+          Central quatrefoil, N radial petals (ogee shapes), outer cusped ring
+          Continuous rotation: 60s cycle default
+        </RoseWindow>
+      </components>
+
+      <hidden_symbols_easter_eggs>
+        Location → Symbol → Equation
+        trefoil-corners → π → 3.14159...
+        quatrefoil-center → φ → (1+√5)/2
+        tracery-intersection → ∞
+        rose-window-center → e^{iπ}+1=0 (KaTeX rendered)
+        arch-apex → ∫
+        cusp-points → ∂
+        
+        Reveal animation: opacity 0→1, scale 0.8→1, blur 4px→0 over 400ms with 200ms delay
+      </hidden_symbols_easter_eggs>
+
+      <validation>
+        - All SVG paths render correctly at various sizes
+        - Draw animations complete smoothly
+        - Hidden symbols reveal on hover
+        - Components accept all props correctly
+        - SVGs have accessibility titles/descriptions
+        - No layout thrashing during animations
+      </validation>
+    </agent>
+
+    <!-- ═════════════════════════════════════════════════════════════════════ -->
+    <!-- AGENT 3: NAVIGATION SYSTEMS ENGINEER                                  -->
+    <!-- ═════════════════════════════════════════════════════════════════════ -->
+    
+    <agent id="3" name="Navigation Systems Engineer" role="Library Card Catalog Navigation">
+      <purpose>
+        Design and implement the library card catalog navigation system - a slide-out 
+        sidebar styled as a vintage card catalog drawer with brass fixtures.
+      </purpose>
+      
+      <tasks>
+        <task priority="critical">Create card catalog drawer with 3D transform opening</task>
+        <task priority="critical">Design navigation cards with brass holder styling</task>
+        <task priority="high">Implement typewriter-style labels</task>
+        <task priority="high">Add paper texture and aging effects</task>
+        <task priority="high">Create mobile bottom sheet variant</task>
+        <task priority="medium">Implement keyboard navigation and accessibility</task>
+      </tasks>
+
+      <card_catalog_design>
+        <drawer>
+          Material: Aged oak wood texture with visible grain
+          Hardware: Brass pull handle (tarnished patina), brass label holder
+          Dimensions: 60px closed edge, 320px open width, 100vh height
+          
+          Opening animation (500ms, spring ease):
+          - translateX from -260px to 0
+          - Subtle rotateY(-2deg) at start, settling to 0
+          - Box-shadow deepens as drawer extends
+          - Cards stagger-fade in (50ms delay each)
+        </drawer>
+        
+        <navigation_cards>
+          Background: Aged cream paper (#F5F1E6) with noise texture
+          Typography: Courier New/typewriter, faded black (#2C2C2C), slight random rotation
+          Brass holder: #B5915A with tarnish variation
+          
+          Hover: Card lifts (translateY: -2px), shadow appears, brass glints
+          Active: Card pulled forward (translateZ: 10px, scale: 1.02)
+        </navigation_cards>
+        
+        <items>
+          HOME - Main Hall
+          CURRICULUM VITAE - Academic Record
+          PROJECTS - Research Folios
+          RESEARCH - Journal Archive
+          CHALKBOARD - Interactive Studio
+          FAVOURITE PROBLEMS - Mathematical Musings
+        </items>
+      </card_catalog_design>
+
+      <mobile_adaptation breakpoint="768px">
+        Transform to bottom sheet sliding up from bottom
+        Trigger: Hamburger icon styled as stacked index cards
+        Cards arrange horizontally in scrollable row
+        Blurred backdrop overlay
+      </mobile_adaptation>
+
+      <accessibility>
+        - Full keyboard navigation (Tab, Enter, Escape)
+        - ARIA labels for drawer state (expanded/collapsed)
+        - Focus trap when drawer open
+        - Reduced motion: instant state changes
+        - Screen reader announces current page
+      </accessibility>
+
+      <validation>
+        - Drawer opens/closes smoothly
+        - Cards have authentic card catalog appearance
+        - Hover/active states feel tactile
+        - Mobile bottom sheet functions correctly
+        - Keyboard navigation complete
+        - Screen readers work properly
+      </validation>
+    </agent>
+
+    <!-- ═════════════════════════════════════════════════════════════════════ -->
+    <!-- AGENT 4: CHALKBOARD ANIMATION SPECIALIST                              -->
+    <!-- ═════════════════════════════════════════════════════════════════════ -->
+    
+    <agent id="4" name="Chalkboard Animation Specialist" role="Hagoromo Chalk Auto-Writing">
+      <purpose>
+        Create the signature home page chalkboard animation with 3D Hagoromo chalk 
+        sprite that writes mathematical proofs, then rests on the chalk ledge.
+      </purpose>
+      
+      <tasks>
+        <task priority="critical">Model 3D Hagoromo chalk in Three.js</task>
+        <task priority="critical">Implement chalk writing path animation system</task>
+        <task priority="critical">Create chalk texture brush for realistic writing</task>
+        <task priority="high">Build theorem/proof SVG path library</task>
+        <task priority="high">Implement chalk dust particle trail</task>
+        <task priority="high">Create chalk "put down" settling animation</task>
+        <task priority="medium">Random theorem selection on page load</task>
+      </tasks>
+
+      <hagoromo_chalk_3d>
+        Geometry: CylinderGeometry
+        - radiusTop: 0.4, radiusBottom: 0.35, height: 3.5
+        - radialSegments: 16
+        - Tip: Chamfered/worn at writing end
+        
+        Material: MeshStandardMaterial
+        - color: #F8F8F4, roughness: 0.9, metalness: 0
+        - normalMap: Subtle chalk surface texture
+        
+        Animation behavior:
+        - Floating: Hovers 5-8px above surface, subtle rotation wobble (±3°)
+        - Writing: Follows bezier paths, 30-45° angle, variable speed, pressure variation
+        - Completion: Arc to ledge, settle with slight bounce, lay flat (1.5s)
+      </hagoromo_chalk_3d>
+
+      <chalk_brush_algorithm>
+        class ChalkBrush {
+          constructor(ctx, color = '#F5F5F0') {
+            this.bristles = generateBristles(12); // offsetX, offsetY, opacity, size
+          }
+          
+          draw(x, y, pressure = 1) {
+            bristles.forEach(b => {
+              ctx.arc(x + b.offsetX*pressure, y + b.offsetY*pressure, b.size*pressure, 0, 2π);
+              ctx.fillStyle = rgba(245,245,240, b.opacity*pressure);
+            });
+          }
+          
+          stroke(fromX, fromY, toX, toY, pressure) {
+            const steps = Math.ceil(distance / 2);
+            for (let i = 0; i <= steps; i++) {
+              draw(lerp(from, to, i/steps), pressure);
+            }
+          }
+        }
+      </chalk_brush_algorithm>
+
+      <writing_system>
+        Chalkboard: #1A1A1A with slate texture at 5% opacity, 16:9 aspect ratio
+        Ledge: Bottom 8%, wooden with chalk dust accumulation
+        
+        Path processing:
+        1. Load SVG path for selected theorem
+        2. Parse into drawable segments
+        3. Calculate path length and duration
+        4. Animate chalk position along path with GSAP
+        5. Draw chalk brush at each frame
+        6. Spawn dust particles at writing point
+        
+        Timing:
+        - Base speed: 100px/second
+        - Ease in at stroke start, ease out at end
+        - Pause between strokes: 200-400ms
+        - Pause between characters: 100-200ms
+      </writing_system>
+
+      <theorem_library>
+        euler_identity: e^{iπ} + 1 = 0 (8s) - "Most beautiful equation"
+        pythagorean: a² + b² = c² (6s) - "Foundation of geometry"
+        quadratic: x = (-b ± √(b²-4ac))/2a (12s) - "Quadratic formula"
+        gaussian: ∫_{-∞}^{∞} e^{-x²} dx = √π (15s) - "Gaussian integral"
+        cauchy: f(a) = (1/2πi) ∮_γ f(z)/(z-a) dz (18s) - "Complex analysis"
+        fundamental_calculus: d/dx ∫_a^x f(t)dt = f(x) (14s)
+      </theorem_library>
+
+      <chalk_dust_particles>
+        Spawn rate: 3-5 particles/frame while writing
+        Properties: random velocity (0.5-2 px/frame), gravity 0.02, friction 0.98
+        Lifetime: 60-120 frames, size 1-3px
+        Color: rgba(245,245,240, 0.4-0.8), linear fade
+        
+        GSAP Physics2D:
+        gsap.to(particle, {
+          physics2D: { velocity: random(50,100), angle: random(360), gravity: 50, friction: 0.1 },
+          opacity: 0, duration: 2
+        });
+      </chalk_dust_particles>
+
+      <validation>
+        - 3D chalk renders correctly in Three.js
+        - Chalk follows writing paths accurately
+        - Chalk brush creates realistic texture
+        - Writing speed feels natural
+        - Dust particles drift convincingly
+        - Settling animation feels physical
+        - Random theorem selection works
+        - 60fps performance maintained
+      </validation>
+    </agent>
+
+    <!-- ═════════════════════════════════════════════════════════════════════ -->
+    <!-- AGENT 5: INTERACTIVE CHALKBOARD DEVELOPER                             -->
+    <!-- ═════════════════════════════════════════════════════════════════════ -->
+    
+    <agent id="5" name="Interactive Chalkboard Developer" role="Full Canvas Studio">
+      <purpose>
+        Build the interactive chalkboard page where users draw mathematics with 
+        realistic chalk tools and export as LaTeX via Gemini API.
+      </purpose>
+      
+      <tasks>
+        <task priority="critical">Create Canvas 2D drawing with chalk brush</task>
+        <task priority="critical">Implement multiple chalk colors (white, yellow, pink, blue)</task>
+        <task priority="critical">Build eraser with realistic smudging</task>
+        <task priority="critical">Integrate Gemini API for LaTeX transcription</task>
+        <task priority="high">Add adjustable brush sizes</task>
+        <task priority="high">Implement grid toggle for graph paper</task>
+        <task priority="high">Create pressure sensitivity support</task>
+        <task priority="medium">Add shake-to-clear for mobile</task>
+        <task priority="medium">Build gallery for save/load drawings</task>
+        <task priority="medium">Implement double-click dust cloud effect</task>
+      </tasks>
+
+      <canvas_specs>
+        Dimensions: Responsive (container width), 4:3 aspect ratio, 2x DPR for retina
+        Background: #1A1A1A, slate texture 8% opacity
+        Grid: Optional, 40px spacing, rgba(245,245,240, 0.1), dotted
+      </canvas_specs>
+
+      <drawing_tools>
+        <chalk default="true">
+          Colors: white #F5F5F0 (default), yellow #F5E6A3, pink #F5A3B5, blue #A3C5F5
+          Sizes: fine (2), medium (5, default), thick (10), bold (18)
+          Brush: Use ChalkBrush class, opacity varies with speed
+        </chalk>
+        
+        <eraser>
+          Sizes: small (20), medium (40, default), large (80)
+          Behavior: Partial blend (smudge) not hard erase, leaves 5% residue
+          Visual: Eraser icon follows cursor
+        </eraser>
+      </drawing_tools>
+
+      <pressure_sensitivity>
+        canvas.addEventListener('pointermove', (e) => {
+          const pressure = e.pressure || 0.5;
+          const adjustedSize = brushSize * (0.5 + pressure * 0.5);
+          const adjustedOpacity = 0.3 + pressure * 0.7;
+          chalkBrush.stroke(lastX, lastY, e.offsetX, e.offsetY, pressure);
+        });
+      </pressure_sensitivity>
+
+      <gemini_api_integration>
+        Workflow:
+        1. User clicks "Export to LaTeX"
+        2. Canvas exports as PNG base64
+        3. Loading state shows proof-writing animation
+        4. API call with system prompt:
+           "Transcribe all mathematical notation in this handwritten image to 
+           properly formatted LaTeX. Use appropriate environments. Return only 
+           LaTeX code with no explanation or markdown."
+        5. Response displayed in preview modal with KaTeX rendering
+        6. User can copy LaTeX or download .tex file
+        
+        Implementation:
+        import { GoogleGenerativeAI } from '@google/generative-ai';
+        const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY);
+        
+        async function transcribeToLatex(imageBase64) {
+          const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+          const result = await model.generateContent([prompt, { inlineData: { mimeType: 'image/png', data: imageBase64 }}]);
+          return result.response.text();
+        }
+      </gemini_api_integration>
+
+      <mobile_features>
+        Shake-to-clear: threshold 15, eraser sweep animation, dust cloud
+        Touch optimization: palm rejection, two-finger pan/zoom
+      </mobile_features>
+
+      <double_click_dust>
+        Trigger: Double-click anywhere on canvas
+        Effect: 20-40 particles burst from click point, Physics2D motion, fade 1.5s
+      </double_click_dust>
+
+      <gallery_system>
+        Storage: IndexedDB
+        Save: Canvas image data, timestamp, optional title, 200px thumbnail
+        Load: Restore canvas, option to merge/overlay
+        Export: Download as PNG
+      </gallery_system>
+
+      <ui_components>
+        Toolbar (bottom mobile, right desktop):
+        - Color picker: Circular swatches, active ring highlight
+        - Size slider: Preview dot shows current size
+        - Tool toggle: Chalk/Eraser icons
+        - Grid toggle, Clear button, Export button, Gallery button
+        
+        Export modal:
+        - KaTeX preview section
+        - Copyable raw LaTeX textarea
+        - Copy to clipboard, Download .tex buttons
+      </ui_components>
+
+      <validation>
+        - Drawing responsive and smooth
+        - Chalk texture authentic
+        - All colors/sizes work
+        - Eraser smudges properly
+        - Pressure sensitivity responds
+        - Grid toggles correctly
+        - Gemini transcribes accurately
+        - LaTeX preview renders
+        - Shake-to-clear functions
+        - Gallery saves/loads
+        - Double-click dust triggers
+      </validation>
+    </agent>
+
+    <!-- ═════════════════════════════════════════════════════════════════════ -->
+    <!-- AGENT 6: CONTENT PAGES ARCHITECT                                      -->
+    <!-- ═════════════════════════════════════════════════════════════════════ -->
+    
+    <agent id="6" name="Content Pages Architect" role="CV, Projects, Research">
+      <purpose>
+        Design and implement CV (Academic Poster), Projects (Research Folios), 
+        and Research (Journal Archive) pages with Gothic styling.
+      </purpose>
+      
+      <tasks>
+        <task priority="critical">Build Academic Poster CV layout</task>
+        <task priority="critical">Create Research Folios for projects</task>
+        <task priority="critical">Implement Journal Archive for research</task>
+        <task priority="high">Add expandable card interactions</task>
+        <task priority="high">Integrate PDF viewer/download</task>
+        <task priority="medium">Create print-optimized stylesheets</task>
+      </tasks>
+
+      <cv_page design="Academic Poster">
+        Layout: Clean conference poster style
+        
+        Header: Name, title, contact, optional photo in quatrefoil frame
+        
+        Sections (2-column desktop, 1-column mobile):
+        - Education: Timeline with Gothic arch markers
+        - Research Interests: Tag cloud with math symbols
+        - Publications: Numbered citations
+        - Teaching: Semester blocks
+        - Awards: Highlighted boxes with gold accent
+        - Skills: Categorized lists
+        
+        Footer: Download PDF button, last updated date
+        
+        Visual: Off-white paper texture, tracery dividers, sage headings, gold highlights
+        Interactions: Section hover elevation, expandable abstracts
+      </cv_page>
+
+      <projects_page design="Research Folios">
+        Concept: Projects as manila folders on library shelf
+        
+        Folder closed state:
+        - Manila folder with brass fastener
+        - Typewriter label with title
+        - Color-coded category tab
+        - 1-2 line preview visible
+        
+        Folder open state (600ms 3D rotation):
+        - Papers stagger-reveal inside
+        - Full title, date, collaborators
+        - Extended description
+        - Image gallery
+        - GitHub/paper/demo links
+        - Technology tags
+        
+        Layout: Overlapping folders on wooden shelf, fanned
+        Filtering: By category, sort by date/name
+        Animation: Folders shuffle/reorder smoothly
+      </projects_page>
+
+      <research_page design="Journal Archive">
+        Concept: Bound journal volumes on bookshelf
+        
+        Volume appearance:
+        - Leather spine with gold-foil title
+        - Color-coded by category (sage/brown tones)
+        - Gothic arch embossing
+        
+        Shelf state: Tilted casually, hover tips volume out
+        
+        Open state: Volume slides out, "opens" with page fan effect
+        
+        Table of contents: Papers list with date, venue, coauthors
+        
+        Paper view:
+        - Expandable abstract
+        - PDF/ArXiv/DOI links
+        - BibTeX copy, formatted citations (APA, MLA, Chicago)
+        
+        Layout: Full-width bookshelf, rows by research area
+        Search: Text search across papers
+      </research_page>
+
+      <shared_components>
+        Expandable card: Click expands inline, smooth height (GSAP flip), stagger content
+        PDF integration: PDF.js viewer, direct download, auto thumbnail
+        Metadata: Consistent date format, Last/First authors, clickable tags
+      </shared_components>
+
+      <validation>
+        - CV displays all sections correctly
+        - Academic poster looks professional
+        - PDF downloads work
+        - Project folders open/close smoothly
+        - Research volumes look like books
+        - Keyboard accessible
+        - Print stylesheets clean
+        - Filtering/sorting works
+        - Mobile layouts attractive
+      </validation>
+    </agent>
+
+    <!-- ═════════════════════════════════════════════════════════════════════ -->
+    <!-- AGENT 7: BLOG SYSTEM DEVELOPER                                        -->
+    <!-- ═════════════════════════════════════════════════════════════════════ -->
+    
+    <agent id="7" name="Blog System Developer" role="Favourite Problems Blog">
+      <purpose>
+        Create the "Favourite Problems" blog with Coffee Table Mathematics design -
+        beautiful, shareable presentations of elegant mathematics.
+      </purpose>
+      
+      <tasks>
+        <task priority="critical">Design Coffee Table card component</task>
+        <task priority="critical">Implement MDX with KaTeX integration</task>
+        <task priority="critical">Build blog listing page</task>
+        <task priority="high">Create individual post template</task>
+        <task priority="high">Add syntax highlighting</task>
+        <task priority="medium">Implement social sharing</task>
+        <task priority="medium">Add reading time estimation</task>
+        <task priority="medium">Create related posts</task>
+      </tasks>
+
+      <coffee_table_card>
+        Concept: Each post as framed mathematical art
+        
+        Card (400x300px preview):
+        - Background options: cream paper, blackboard, graph paper, parchment (frontmatter)
+        - Decorative border with Gothic corner ornaments
+        - Hero equation: Large KaTeX display, center-top
+        - Title: Cormorant Garamond, large
+        - Excerpt: IBM Plex Serif italic, 100 chars max
+        - Metadata: Date, reading time, topic tag
+        
+        Hover: Card lifts, shadow deepens, title reveals full if truncated
+      </coffee_table_card>
+
+      <blog_listing>
+        Intro: Title "Favourite Problems", subtitle, John's description
+        Grid: 3 columns desktop, 2 tablet, 1 mobile, 2rem gap
+        Filtering: By topic (Algebra, Analysis, Geometry, Number Theory...)
+        Sorting: Newest, Oldest, Alphabetical
+        Load more: Infinite scroll or button, 9 posts batch, stagger fade-in
+      </blog_listing>
+
+      <post_template>
+        Hero:
+        - Primary equation in large display
+        - Title, metadata, Gothic tracery border
+        
+        Content (max 720px centered):
+        - Body: IBM Plex Serif, 1.125rem, 1.8 line-height
+        - Math: KaTeX inline and display
+        - Code: Fira Code with syntax highlighting
+        
+        Custom elements:
+        - Theorem box: Highlighted, arch accent top, sage left border
+        - Proof block: Indented, "Proof:" small caps, QED symbol
+        - Figure: Centered, caption, optional Gothic frame
+        - Blockquote: Spectral font, gold accent bar
+        
+        Footer: Share buttons, 2-3 related posts, prev/next navigation
+      </post_template>
+
+      <mdx_configuration>
+        KaTeX: $...$ inline, $$...$$ display, auto-render
+        Syntax highlighting: Prism/Shiki, custom theme, python/js/latex/haskell/rust
+        
+        Custom components: Theorem, Proof, Definition, Example, Figure
+        
+        Frontmatter:
+        ---
+        title: "The Beauty of Euler's Identity"
+        date: 2024-01-15
+        topic: "Complex Analysis"
+        heroEquation: "e^{i\\pi} + 1 = 0"
+        background: "blackboard"
+        excerpt: "Exploring why..."
+        readingTime: 8
+        tags: ["euler", "complex-numbers"]
+        ---
+      </mdx_configuration>
+
+      <social_sharing>
+        Twitter: "{title}" - {excerpt} + URL
+        LinkedIn: Title + URL
+        Copy link: Toast notification
+        
+        OG metadata:
+        - title: {post.title} | John Christopher
+        - description: {excerpt}
+        - image: Auto-generated card with hero equation
+        - type: article
+      </social_sharing>
+
+      <validation>
+        - Coffee Table cards display beautifully
+        - KaTeX equations render correctly
+        - Code blocks highlight properly
+        - MDX custom components work
+        - Filtering/sorting works
+        - Posts readable and well-formatted
+        - Social sharing generates previews
+        - Related posts algorithm sensible
+        - Mobile reading excellent
+      </validation>
+    </agent>
+
+    <!-- ═════════════════════════════════════════════════════════════════════ -->
+    <!-- AGENT 8: ANIMATION AND INTERACTION ENGINEER                           -->
+    <!-- ═════════════════════════════════════════════════════════════════════ -->
+    
+    <agent id="8" name="Animation and Interaction Engineer" role="GSAP and Micro-interactions">
+      <purpose>
+        Implement all micro-interactions, page transitions, scroll animations, 
+        ensuring cohesive motion design throughout using GSAP.
+      </purpose>
+      
+      <tasks>
+        <task priority="critical">Implement page transition with inertia/weight</task>
+        <task priority="critical">Create typewriter button depress</task>
+        <task priority="critical">Build card elevation shadow system</task>
+        <task priority="high">Implement loading proof animations</task>
+        <task priority="high">Create scroll-triggered reveals</task>
+        <task priority="high">Build Gothic tracery hover reveal</task>
+        <task priority="medium">Implement particle systems (chalk dust)</task>
+        <task priority="medium">Create mobile shake detection</task>
+        <task priority="medium">Ensure reduced-motion preferences respected</task>
+      </tasks>
+
+      <page_transitions>
+        // PageTransition.tsx
+        const handleRouteChangeStart = () => {
+          gsap.to(currentPage, { x: '-5%', opacity: 0.3, scale: 0.98, duration: 0.4, ease: 'power2.in' });
+        };
+        
+        const handleRouteChangeComplete = () => {
+          gsap.fromTo(newPage,
+            { x: '5%', opacity: 0, scale: 0.98 },
+            { x: '0%', opacity: 1, scale: 1, duration: 0.6, ease: 'power2.out', clearProps: 'all' }
+          );
+        };
+      </page_transitions>
+
+      <scroll_animations>
+        // useIntersectionAnimation.ts
+        useEffect(() => {
+          const elements = document.querySelectorAll('[data-animate]');
+          
+          elements.forEach(el => {
+            gsap.fromTo(el,
+              { opacity: 0, y: 30 },
+              {
+                opacity: 1, y: 0, duration: 0.6, ease: 'power2.out',
+                scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none reverse' }
+              }
+            );
+          });
+        }, []);
+        
+        Stagger children: delay 0.1s between items
+        Gothic elements: draw-in animation on scroll into view
+      </scroll_animations>
+
+      <loading_animation>
+        // LoadingProof.tsx
+        Random theorem selection from library
+        SVG paths with stroke-dasharray animation
+        Chalk-style appearance
+        Interruptible on content load
+        
+        const theorems = [euler, pythagorean, quadratic, gaussian, cauchy];
+        const selected = theorems[Math.floor(Math.random() * theorems.length)];
+        
+        gsap.fromTo(path, 
+          { strokeDashoffset: pathLength },
+          { strokeDashoffset: 0, duration: selected.duration, ease: 'none' }
+        );
+      </loading_animation>
+
+      <reduced_motion>
+        // Respect prefers-reduced-motion
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        
+        if (prefersReducedMotion) {
+          gsap.globalTimeline.timeScale(0); // Disable all animations
+          // Use instant state changes instead
+        }
+        
+        // CSS fallback
+        @media (prefers-reduced-motion: reduce) {
+          *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+        }
+      </reduced_motion>
+
+      <particle_system>
+        // ChalkDustParticles.ts
+        class ParticleSystem {
+          particles: Particle[] = [];
+          
+          emit(x, y, count = 30) {
+            for (let i = 0; i < count; i++) {
+              const particle = createParticle(x, y);
+              this.particles.push(particle);
+              
+              gsap.to(particle.element, {
+                physics2D: {
+                  velocity: 50 + Math.random() * 50,
+                  angle: Math.random() * 360,
+                  gravity: 50,
+                  friction: 0.1
+                },
+                opacity: 0,
+                duration: 1.5 + Math.random(),
+                onComplete: () => this.remove(particle)
+              });
+            }
+          }
+        }
+      </particle_system>
+
+      <validation>
+        - Page transitions feel weighted and physical
+        - Button presses have tactile feedback
+        - Card shadows respond to elevation
+        - Loading proofs write smoothly
+        - Scroll animations trigger correctly
+        - Tracery symbols reveal on hover
+        - Particles behave realistically
+        - Shake detection works on mobile
+        - Reduced motion respected
+        - 60fps maintained
+      </validation>
+    </agent>
+
+    <!-- ═════════════════════════════════════════════════════════════════════ -->
+    <!-- AGENT 9: ACCESSIBILITY AND PERFORMANCE SPECIALIST                     -->
+    <!-- ═════════════════════════════════════════════════════════════════════ -->
+    
+    <agent id="9" name="Accessibility and Performance Specialist" role="A11y and Optimization">
+      <purpose>
+        Ensure WCAG 2.1 AA compliance, optimize performance for Core Web Vitals,
+        and implement progressive enhancement.
+      </purpose>
+      
+      <tasks>
+        <task priority="critical">Audit and fix accessibility issues</task>
+        <task priority="critical">Implement proper focus management</task>
+        <task priority="critical">Optimize Core Web Vitals (LCP, FID, CLS)</task>
+        <task priority="high">Add screen reader support for math (MathML fallbacks)</task>
+        <task priority="high">Implement reduced motion preferences</task>
+        <task priority="high">Create high contrast mode toggle</task>
+        <task priority="medium">Add skip links and landmarks</task>
+        <task priority="medium">Optimize images and fonts</task>
+        <task priority="medium">Implement service worker for offline</task>
+      </tasks>
+
+      <accessibility_requirements>
+        WCAG 2.1 AA compliance:
+        - Color contrast minimum 4.5:1 for text
+        - Focus indicators visible and styled to match theme
+        - All interactive elements keyboard accessible
+        - ARIA labels on custom components
+        - Alt text for all images
+        - Proper heading hierarchy
+        
+        Math accessibility:
+        - KaTeX generates accessible markup
+        - MathML fallbacks where needed
+        - Screen reader announcements for equations
+        
+        Navigation:
+        - Skip to main content link
+        - Landmark regions (header, nav, main, footer)
+        - Focus trap in modals
+        - Escape key closes overlays
+        
+        Forms:
+        - Labels associated with inputs
+        - Error messages announced
+        - Required fields indicated
+      </accessibility_requirements>
+
+      <high_contrast_mode>
+        Toggle in site settings
+        CSS custom properties switch:
+        --color-primary: #000000;
+        --color-background: #FFFFFF;
+        --color-accent: #0000FF;
+        Remove textures and subtle gradients
+        Increase border widths
+      </high_contrast_mode>
+
+      <performance_optimization>
+        Images:
+        - Next/Image for automatic optimization
+        - WebP with PNG/JPG fallbacks
+        - Lazy loading below fold
+        - Proper sizing (srcset)
+        
+        Fonts:
+        - font-display: swap
+        - Subset to used characters
+        - Preload critical fonts
+        - Self-host (no external requests)
+        
+        JavaScript:
+        - Code split per route
+        - Dynamic imports for heavy components (Three.js, Canvas)
+        - Tree shake unused GSAP plugins
+        
+        CSS:
+        - Purge unused Tailwind classes
+        - Critical CSS inline
+        - Defer non-critical styles
+        
+        Core Web Vitals targets:
+        - LCP < 2.5s
+        - FID < 100ms
+        - CLS < 0.1
+      </performance_optimization>
+
+      <progressive_enhancement>
+        Base experience without JavaScript:
+        - All content readable
+        - Navigation functional
+        - Forms submit properly
+        
+        Enhanced with JavaScript:
+        - Animations and transitions
+        - Interactive chalkboard
+        - Smooth scrolling
+        - Dynamic loading
+      </progressive_enhancement>
+
+      <validation>
+        - Lighthouse accessibility score 95+
+        - axe-core reports zero critical issues
+        - Screen reader testing (VoiceOver, NVDA)
+        - Keyboard-only navigation complete
+        - Reduced motion works correctly
+        - High contrast mode functional
+        - Core Web Vitals pass
+        - Works without JavaScript
+      </validation>
+    </agent>
+
+    <!-- ═════════════════════════════════════════════════════════════════════ -->
+    <!-- AGENT 10: QUALITY ASSURANCE AND DEPLOYMENT                            -->
+    <!-- ═════════════════════════════════════════════════════════════════════ -->
+    
+    <agent id="10" name="Quality Assurance and Deployment" role="Testing and Launch">
+      <purpose>
+        Comprehensive testing across browsers and devices, final integration 
+        verification, and deployment to GitHub Pages.
+      </purpose>
+      
+      <tasks>
+        <task priority="critical">Cross-browser testing (Chrome, Firefox, Safari, Edge)</task>
+        <task priority="critical">Responsive testing (mobile, tablet, desktop)</task>
+        <task priority="critical">Integration testing (all pages and features)</task>
+        <task priority="critical">Configure GitHub Pages deployment</task>
+        <task priority="high">Performance testing and optimization</task>
+        <task priority="high">Security audit (API keys, dependencies)</task>
+        <task priority="medium">SEO optimization</task>
+        <task priority="medium">Create documentation</task>
+        <task priority="medium">Set up monitoring and analytics</task>
+      </tasks>
+
+      <testing_matrix>
+        Browsers:
+        - Chrome (latest 2 versions)
+        - Firefox (latest 2 versions)
+        - Safari (latest 2 versions)
+        - Edge (latest 2 versions)
+        - iOS Safari
+        - Chrome Android
+        
+        Devices:
+        - Desktop: 1920x1080, 1440x900, 1280x720
+        - Tablet: iPad (768x1024), iPad Pro (1024x1366)
+        - Mobile: iPhone 14 (390x844), Pixel 7 (412x915)
+        
+        Test categories:
+        - Navigation functionality
+        - Page transitions and animations
+        - Chalkboard drawing and export
+        - Math rendering (KaTeX)
+        - PDF viewing/downloading
+        - Blog post rendering
+        - Search and filtering
+        - Mobile-specific features (shake, touch)
+        - Accessibility compliance
+      </testing_matrix>
+
+      <integration_tests>
+        1. Navigation flow: Visit each page via card catalog
+        2. Chalkboard complete flow: Draw → Export → Preview → Download
+        3. Blog flow: Listing → Individual post → Related posts
+        4. Research flow: Volume → Paper → Download/Citation
+        5. CV download and print
+        6. Mobile navigation (bottom sheet)
+        7. Loading states (random theorems)
+        8. Error states (network failure, API errors)
+      </integration_tests>
+
+      <github_pages_deployment>
+        // .github/workflows/deploy.yml
+        name: Deploy to GitHub Pages
+        
+        on:
+          push:
+            branches: [main]
+        
+        jobs:
+          build-and-deploy:
+            runs-on: ubuntu-latest
+            steps:
+              - uses: actions/checkout@v4
+              
+              - name: Setup Node
+                uses: actions/setup-node@v4
+                with:
+                  node-version: '20'
+                  cache: 'npm'
+              
+              - name: Install dependencies
+                run: npm ci
+              
+              - name: Build
+                run: npm run build
+                env:
+                  NEXT_PUBLIC_GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+              
+              - name: Export static
+                run: npm run export
+              
+              - name: Deploy to GitHub Pages
+                uses: peaceiris/actions-gh-pages@v3
+                with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  publish_dir: ./out
+        
+        next.config.js:
+        module.exports = {
+          output: 'export',
+          images: { unoptimized: true },
+          basePath: process.env.NODE_ENV === 'production' ? '/portfolio' : '',
+          assetPrefix: process.env.NODE_ENV === 'production' ? '/portfolio/' : '',
+        };
+      </github_pages_deployment>
+
+      <security_checklist>
+        - Gemini API key in GitHub Secrets (not in code)
+        - Environment variables properly configured
+        - No sensitive data in client bundle
+        - Dependencies audited (npm audit)
+        - CSP headers configured
+        - HTTPS enforced
+      </security_checklist>
+
+      <seo_optimization>
+        - Proper meta tags on all pages
+        - OpenGraph and Twitter cards
+        - Structured data (JSON-LD) for articles
+        - Sitemap.xml generated
+        - robots.txt configured
+        - Canonical URLs set
+        - Page titles unique and descriptive
+      </seo_optimization>
+
+      <documentation>
+        README.md:
+        - Project overview
+        - Local development setup
+        - Environment variables
+        - Deployment instructions
+        - Content management (adding blog posts, projects)
+        
+        CONTRIBUTING.md:
+        - Code style guidelines
+        - Component structure
+        - Testing requirements
+      </documentation>
+
+      <validation>
+        - All pages render in all target browsers
+        - No console errors or warnings
+        - All features functional on mobile
+        - Performance metrics meet targets
+        - Accessibility audit passes
+        - Security audit clean
+        - SEO audit passes
+        - Deployment succeeds automatically
+        - Production site fully functional
+      </validation>
+    </agent>
+
+  </sub_agents>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- SECTION 5: IMPLEMENTATION ORDER AND DEPENDENCIES                        -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  
+  <implementation_order>
+    <phase number="1" name="Foundation" duration="Week 1-2">
+      <agent id="1">Project Architect - Complete setup</agent>
+      <agent id="2">Gothic Architecture Engineer - Start SVG components</agent>
+      <dependencies>None - Parallel work possible</dependencies>
+    </phase>
+    
+    <phase number="2" name="Core Structure" duration="Week 2-3">
+      <agent id="2">Gothic Architecture Engineer - Complete components</agent>
+      <agent id="3">Navigation Systems Engineer - Card catalog</agent>
+      <agent id="8">Animation Engineer - Base transitions and interactions</agent>
+      <dependencies>Requires Phase 1 completion</dependencies>
+    </phase>
+    
+    <phase number="3" name="Signature Features" duration="Week 3-5">
+      <agent id="4">Chalkboard Animation Specialist - Auto-writing home page</agent>
+      <agent id="5">Interactive Chalkboard Developer - Drawing canvas + Gemini</agent>
+      <dependencies>Requires Phase 2 Gothic components and animations</dependencies>
+    </phase>
+    
+    <phase number="4" name="Content Pages" duration="Week 4-6">
+      <agent id="6">Content Pages Architect - CV, Projects, Research</agent>
+      <agent id="7">Blog System Developer - Favourite Problems</agent>
+      <dependencies>Requires Phase 2 navigation and styling</dependencies>
+    </phase>
+    
+    <phase number="5" name="Polish and Launch" duration="Week 6-8">
+      <agent id="8">Animation Engineer - Final micro-interactions</agent>
+      <agent id="9">Accessibility and Performance - Audit and optimize</agent>
+      <agent id="10">QA and Deployment - Testing and launch</agent>
+      <dependencies>Requires all previous phases substantially complete</dependencies>
+    </phase>
+  </implementation_order>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- SECTION 6: CREATIVE DIRECTIVES                                          -->
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+  
+  <creative_directives>
+    <principle name="Reject Generic">
+      Never default to standard UI patterns. Every element should feel specifically 
+      designed for a mathematician's portfolio. Card catalog over hamburger menu.
+      Journal volumes over simple lists. Chalk brush over basic drawing tools.
+    </principle>
+    
+    <principle name="Physics Over State">
+      Interactions should feel physical. Buttons depress like keys. Pages turn with
+      weight. Cards cast real shadows. Particles drift and settle. Use GSAP Physics2D
+      and InertiaPlugin to achieve this.
+    </principle>
+    
+    <principle name="Hidden Depth">
+      Reward exploration with Easter eggs. Mathematical symbols hidden in Gothic
+      tracery. Different theorems on each page load. Details that only observant
+      visitors will discover.
+    </principle>
+    
+    <principle name="Scholarly Whimsy">
+      Balance gravitas with playfulness. The site should feel like a serious
+      mathematician's workspace that happens to be delightfully designed. 
+      Professional content, whimsical presentation.
+    </principle>
+    
+    <principle name="Authentic Gothic">
+      Gothic elements should be architecturally informed, not superficially applied.
+      Understand lancet arches, trefoils, quatrefoils, tracery, and use them 
+      structurally as real Gothic architects would - as functional frames and 
+      supports, not mere decoration.
+    </principle>
+    
+    <principle name="Mathematical Beauty">
+      The site should embody the elegance mathematicians see in their work.
+      Clean proofs. Elegant solutions. The beauty of e^iπ + 1 = 0. Every design
+      decision should resonate with someone who appreciates mathematical aesthetics.
+    </principle>
+  </creative_directives>
+
+</development_prompt>
