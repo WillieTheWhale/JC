@@ -1,7 +1,8 @@
 'use client';
 
 import { ChalkboardHero, InteractiveChalkboard } from '@/components/chalkboard';
-import { Github, ExternalLink, BookOpen, Mail } from 'lucide-react';
+import { IlluminatedHeader, JournalCard } from '@/components/ui';
+import { Github, ExternalLink, BookOpen, Mail, Scroll, FlaskConical, Pen } from 'lucide-react';
 
 // Sample data - in production, import from lib/data
 const researchItems = [
@@ -80,21 +81,11 @@ export default function HomePage() {
       <section id="about" className="relative py-24 px-6">
         <div className="max-w-4xl mx-auto">
           {/* Section header */}
-          <div className="flex items-center gap-6 mb-12">
-            <div
-              className="h-px flex-1"
-              style={{
-                background: 'linear-gradient(90deg, transparent 0%, var(--color-brass-tarnished) 100%)',
-              }}
-            />
-            <h2 className="font-heading text-display text-parchment tracking-wide">About</h2>
-            <div
-              className="h-px flex-1"
-              style={{
-                background: 'linear-gradient(90deg, var(--color-brass-tarnished) 0%, transparent 100%)',
-              }}
-            />
-          </div>
+          <IlluminatedHeader
+            title="About"
+            subtitle="The scholar behind the equations"
+            symbol="φ"
+          />
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* Portrait placeholder */}
@@ -154,58 +145,44 @@ export default function HomePage() {
       <section id="research" className="relative py-24 px-6 bg-sage-deepest/70">
         <div className="max-w-5xl mx-auto">
           {/* Section header */}
-          <div className="flex items-center gap-6 mb-12">
-            <div
-              className="h-px flex-1"
-              style={{
-                background: 'linear-gradient(90deg, transparent 0%, var(--color-brass-tarnished) 100%)',
-              }}
-            />
-            <h2 className="font-heading text-display text-parchment tracking-wide">Research</h2>
-            <div
-              className="h-px flex-1"
-              style={{
-                background: 'linear-gradient(90deg, var(--color-brass-tarnished) 0%, transparent 100%)',
-              }}
-            />
-          </div>
-
-          <p className="text-center text-parchment-aged mb-12 max-w-2xl mx-auto font-decorative italic">
-            Exploring the hidden patterns that unify abstract mathematics
-          </p>
+          <IlluminatedHeader
+            title="Research"
+            subtitle="Exploring the hidden patterns that unify abstract mathematics"
+            symbol="∫"
+          />
 
           {/* Research items - styled as journal entries */}
-          <div className="space-y-6">
+          <div className="space-y-6 mt-8">
             {researchItems.map((item, index) => (
-              <article
+              <JournalCard
                 key={index}
-                className="group p-6 rounded-sm transition-all duration-300 hover:translate-x-2"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(232, 220, 196, 0.05) 0%, rgba(232, 220, 196, 0.02) 100%)',
-                  borderLeft: '2px solid var(--color-brass-tarnished)',
-                }}
+                variant="paper"
+                className="group"
               >
                 <div className="flex flex-wrap items-start justify-between gap-4 mb-3">
-                  <h3 className="font-heading text-xl text-parchment group-hover:text-gold transition-colors duration-300">
-                    {item.title}
-                  </h3>
-                  <span className="text-xs text-brass-tarnished">
-                    {item.venue} &middot; {item.year}
+                  <div className="flex items-center gap-3">
+                    <Scroll className="w-5 h-5 text-brass-tarnished" />
+                    <h3 className="font-heading text-xl text-parchment group-hover:text-gold transition-colors duration-300">
+                      {item.title}
+                    </h3>
+                  </div>
+                  <span className="text-xs text-brass-tarnished font-decorative">
+                    {item.venue} · {item.year}
                   </span>
                 </div>
-                <p className="text-parchment-aged text-sm mb-4">{item.description}</p>
+                <p className="text-parchment-aged text-sm mb-4 leading-relaxed">{item.description}</p>
                 <div className="flex flex-wrap gap-2">
                   {item.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-2 py-1 text-xs text-brass rounded-sm"
-                      style={{ background: 'rgba(139, 115, 85, 0.2)' }}
+                      className="px-3 py-1 text-xs text-brass rounded-sm border border-brass-tarnished/30"
+                      style={{ background: 'rgba(139, 115, 85, 0.15)' }}
                     >
                       {tag}
                     </span>
                   ))}
                 </div>
-              </article>
+              </JournalCard>
             ))}
           </div>
         </div>
@@ -215,49 +192,27 @@ export default function HomePage() {
       <section id="projects" className="relative py-24 px-6">
         <div className="max-w-5xl mx-auto">
           {/* Section header */}
-          <div className="flex items-center gap-6 mb-12">
-            <div
-              className="h-px flex-1"
-              style={{
-                background: 'linear-gradient(90deg, transparent 0%, var(--color-brass-tarnished) 100%)',
-              }}
-            />
-            <h2 className="font-heading text-display text-parchment tracking-wide">Projects</h2>
-            <div
-              className="h-px flex-1"
-              style={{
-                background: 'linear-gradient(90deg, var(--color-brass-tarnished) 0%, transparent 100%)',
-              }}
-            />
-          </div>
-
-          <p className="text-center text-parchment-aged mb-12 max-w-2xl mx-auto font-decorative italic">
-            Tools and visualizations bringing mathematical concepts to life
-          </p>
+          <IlluminatedHeader
+            title="Projects"
+            subtitle="Tools and visualizations bringing mathematical concepts to life"
+            symbol="∑"
+          />
 
           {/* Project cards */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
             {projects.map((project, index) => (
-              <article
+              <JournalCard
                 key={index}
-                className="group relative p-6 rounded-sm transition-all duration-500"
-                style={{
-                  background: 'linear-gradient(145deg, rgba(232, 220, 196, 0.08) 0%, rgba(232, 220, 196, 0.03) 100%)',
-                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
-                }}
+                variant="index"
+                className="group h-full flex flex-col"
               >
-                {/* Decorative corner */}
-                <div
-                  className="absolute top-0 right-0 w-8 h-8"
-                  style={{
-                    background: 'linear-gradient(135deg, transparent 50%, rgba(139, 115, 85, 0.3) 50%)',
-                  }}
-                />
-
-                <h3 className="font-heading text-lg text-parchment mb-3 group-hover:text-gold transition-colors duration-300">
-                  {project.title}
-                </h3>
-                <p className="text-parchment-aged text-sm mb-4 leading-relaxed">
+                <div className="flex items-center gap-3 mb-3">
+                  <FlaskConical className="w-5 h-5 text-brass-tarnished" />
+                  <h3 className="font-heading text-lg text-parchment group-hover:text-gold transition-colors duration-300">
+                    {project.title}
+                  </h3>
+                </div>
+                <p className="text-parchment-aged text-sm mb-4 leading-relaxed flex-grow">
                   {project.description}
                 </p>
 
@@ -267,6 +222,7 @@ export default function HomePage() {
                     <span
                       key={tech}
                       className="px-2 py-0.5 text-xs text-brass-tarnished border border-brass-tarnished/30 rounded-sm"
+                      style={{ background: 'rgba(139, 115, 85, 0.1)' }}
                     >
                       {tech}
                     </span>
@@ -274,7 +230,7 @@ export default function HomePage() {
                 </div>
 
                 {/* Links */}
-                <div className="flex gap-4 mt-auto">
+                <div className="flex gap-4 mt-auto pt-2 border-t border-brass-tarnished/20">
                   {project.links.github && (
                     <a
                       href={project.links.github}
@@ -294,7 +250,7 @@ export default function HomePage() {
                     </a>
                   )}
                 </div>
-              </article>
+              </JournalCard>
             ))}
           </div>
         </div>
@@ -304,56 +260,38 @@ export default function HomePage() {
       <section id="writings" className="relative py-24 px-6 bg-sage-deepest/70">
         <div className="max-w-4xl mx-auto">
           {/* Section header */}
-          <div className="flex items-center gap-6 mb-12">
-            <div
-              className="h-px flex-1"
-              style={{
-                background: 'linear-gradient(90deg, transparent 0%, var(--color-brass-tarnished) 100%)',
-              }}
-            />
-            <h2 className="font-heading text-display text-parchment tracking-wide">Favourite Problems</h2>
-            <div
-              className="h-px flex-1"
-              style={{
-                background: 'linear-gradient(90deg, var(--color-brass-tarnished) 0%, transparent 100%)',
-              }}
-            />
-          </div>
-
-          <p className="text-center text-parchment-aged mb-12 max-w-2xl mx-auto font-decorative italic">
-            Mathematical musings on elegant problems and beautiful solutions
-          </p>
+          <IlluminatedHeader
+            title="Favourite Problems"
+            subtitle="Mathematical musings on elegant problems and beautiful solutions"
+            symbol="∞"
+          />
 
           {/* Writing entries */}
-          <div className="space-y-8">
+          <div className="space-y-8 mt-8">
             {writings.map((writing, index) => (
-              <article
+              <JournalCard
                 key={index}
+                variant="manuscript"
                 className="group cursor-pointer"
               >
-                <div
-                  className="p-6 rounded-sm transition-all duration-300 group-hover:translate-y-[-2px]"
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(245, 239, 224, 0.06) 0%, rgba(245, 239, 224, 0.02) 100%)',
-                    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.15)',
-                  }}
-                >
-                  <div className="flex items-start justify-between gap-4 mb-3">
-                    <div>
-                      <span className="text-xs text-brass mb-2 block">{writing.topic}</span>
-                      <h3 className="font-heading text-xl text-parchment group-hover:text-gold transition-colors duration-300">
-                        {writing.title}
-                      </h3>
+                <div className="flex items-start justify-between gap-4 mb-3">
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Pen className="w-4 h-4 text-brass" />
+                      <span className="text-xs text-brass font-decorative">{writing.topic}</span>
                     </div>
-                    <span className="text-xs text-brass-tarnished whitespace-nowrap">{writing.date}</span>
+                    <h3 className="font-heading text-xl text-parchment group-hover:text-gold transition-colors duration-300">
+                      {writing.title}
+                    </h3>
                   </div>
-                  <p className="text-parchment-aged text-sm leading-relaxed">{writing.excerpt}</p>
-                  <div className="mt-4 flex items-center gap-2 text-brass group-hover:text-gold transition-colors duration-300">
-                    <BookOpen size={14} />
-                    <span className="text-xs">Read more</span>
-                  </div>
+                  <span className="text-xs text-brass-tarnished whitespace-nowrap font-decorative italic">{writing.date}</span>
                 </div>
-              </article>
+                <p className="text-parchment-aged text-sm leading-relaxed">{writing.excerpt}</p>
+                <div className="mt-4 flex items-center gap-2 text-brass group-hover:text-gold transition-colors duration-300">
+                  <BookOpen size={14} />
+                  <span className="text-xs font-decorative">Read more</span>
+                </div>
+              </JournalCard>
             ))}
           </div>
         </div>
@@ -363,38 +301,60 @@ export default function HomePage() {
       <section id="chalkboard" className="relative py-24 px-6">
         <div className="max-w-4xl mx-auto">
           {/* Section header */}
-          <div className="flex items-center gap-6 mb-12">
+          <IlluminatedHeader
+            title="Chalkboard"
+            subtitle="An interactive canvas for mathematical exploration"
+            symbol="∂"
+          />
+
+          {/* Interactive Chalkboard */}
+          <div className="mt-8">
+            <InteractiveChalkboard />
+          </div>
+        </div>
+      </section>
+
+      {/* Quote section before footer */}
+      <section className="py-24 px-6 relative overflow-hidden">
+        {/* Decorative background element */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: 'radial-gradient(ellipse at center, rgba(196, 163, 90, 0.03) 0%, transparent 70%)',
+          }}
+        />
+        <div className="max-w-3xl mx-auto text-center relative">
+          {/* Decorative quotation marks */}
+          <span
+            className="absolute -top-8 -left-4 text-8xl text-brass-tarnished/10 font-decorative select-none"
+            aria-hidden="true"
+          >
+            &ldquo;
+          </span>
+          <blockquote className="font-decorative text-2xl italic text-parchment-aged mb-6 leading-relaxed">
+            Mathematics, rightly viewed, possesses not only truth, but supreme beauty&mdash;a beauty cold and austere, like that of sculpture.
+          </blockquote>
+          <div className="flex items-center justify-center gap-4">
             <div
-              className="h-px flex-1"
+              className="h-px w-12"
               style={{
                 background: 'linear-gradient(90deg, transparent 0%, var(--color-brass-tarnished) 100%)',
               }}
             />
-            <h2 className="font-heading text-display text-parchment tracking-wide">Chalkboard</h2>
+            <cite className="text-brass text-sm not-italic font-heading tracking-wider">Bertrand Russell</cite>
             <div
-              className="h-px flex-1"
+              className="h-px w-12"
               style={{
                 background: 'linear-gradient(90deg, var(--color-brass-tarnished) 0%, transparent 100%)',
               }}
             />
           </div>
-
-          <p className="text-center text-parchment-aged mb-8 max-w-2xl mx-auto font-decorative italic">
-            An interactive canvas for mathematical exploration
-          </p>
-
-          {/* Interactive Chalkboard */}
-          <InteractiveChalkboard />
-        </div>
-      </section>
-
-      {/* Quote section before footer */}
-      <section className="py-20 px-6">
-        <div className="max-w-3xl mx-auto text-center">
-          <blockquote className="font-decorative text-2xl italic text-parchment-aged mb-4">
-            &ldquo;Mathematics, rightly viewed, possesses not only truth, but supreme beauty&mdash;a beauty cold and austere, like that of sculpture.&rdquo;
-          </blockquote>
-          <cite className="text-brass text-sm not-italic">&mdash; Bertrand Russell</cite>
+          <span
+            className="absolute -bottom-8 -right-4 text-8xl text-brass-tarnished/10 font-decorative select-none"
+            aria-hidden="true"
+          >
+            &rdquo;
+          </span>
         </div>
       </section>
     </div>
