@@ -426,6 +426,75 @@ code, pre {
 .chalk-blue { color: var(--color-chalk-blue); text-shadow: 0 0 3px rgba(168,197,216,0.5); }
 .chalk-sage { color: var(--color-chalk-sage); text-shadow: 0 0 3px rgba(196,216,196,0.5); }
 
+/* ─── KaTeX Chalk Styling ─── */
+/* Styles for mathematical equations rendered with chalk effect */
+.katex-chalk {
+  color: var(--color-chalk-white) !important;
+}
+
+.katex-chalk .katex {
+  color: inherit;
+}
+
+.katex-chalk .katex-html {
+  color: inherit;
+}
+
+/* Style all KaTeX text elements for chalk appearance */
+.katex-chalk .katex .mord,
+.katex-chalk .katex .mop,
+.katex-chalk .katex .mbin,
+.katex-chalk .katex .mrel,
+.katex-chalk .katex .mopen,
+.katex-chalk .katex .mclose,
+.katex-chalk .katex .mpunct,
+.katex-chalk .katex .minner {
+  color: var(--color-chalk-white);
+}
+
+/* Ensure fractions and other structures are chalk-colored */
+.katex-chalk .katex .frac-line {
+  border-bottom-color: var(--color-chalk-white);
+}
+
+.katex-chalk .katex .sqrt > .sqrt-sign {
+  color: var(--color-chalk-white);
+}
+
+.katex-chalk .katex .sqrt > .vlist {
+  color: var(--color-chalk-white);
+}
+
+/* Style the rule lines in fractions */
+.katex-chalk .katex .mfrac > .vlist-t > .vlist-r > .vlist > span > .pstrut + span.frac-line {
+  background: var(--color-chalk-white);
+}
+
+/* Make sure all text is chalk white */
+.katex-chalk .katex .mathnormal,
+.katex-chalk .katex .mathit,
+.katex-chalk .katex .mathrm,
+.katex-chalk .katex .mathbf,
+.katex-chalk .katex .mathsf,
+.katex-chalk .katex .mathtt,
+.katex-chalk .katex .mathbb {
+  color: var(--color-chalk-white);
+}
+
+/* Style operators and symbols */
+.katex-chalk .katex .op-symbol,
+.katex-chalk .katex .large-op {
+  color: var(--color-chalk-white);
+}
+
+/* Subtle texture effect on chalk text */
+.katex-chalk .katex-display {
+  text-shadow:
+    0 0 1px rgba(245, 245, 240, 0.9),
+    0 0 4px rgba(245, 245, 240, 0.4),
+    1px 1px 1px rgba(0, 0, 0, 0.2);
+}
+
 /* ─── Chalk ledge ─── */
 .chalk-ledge {
   background: linear-gradient(

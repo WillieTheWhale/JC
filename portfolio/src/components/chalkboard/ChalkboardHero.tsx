@@ -1,13 +1,15 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
+import katex from 'katex';
+import { featuredTheorems } from '@/lib/theorems';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // CHALKBOARD HERO - Self-Writing Mathematical Proofs
-// A realistic chalkboard with Hagoromo-style chalk that writes theorems
+// Progressive reveal animation with chalk texture effect
 // ═══════════════════════════════════════════════════════════════════════════════
 
-interface ChalkParticle {
+interface ChalkDustParticle {
   x: number;
   y: number;
   vx: number;
@@ -17,155 +19,86 @@ interface ChalkParticle {
   life: number;
 }
 
-// Simple equations that render nicely without LaTeX
-const displayEquations = [
-  { text: 'e^(iπ) + 1 = 0', name: "Euler's Identity", mathematician: 'Leonhard Euler', year: 1748, description: 'The most beautiful equation in mathematics' },
-  { text: 'a² + b² = c²', name: 'Pythagorean Theorem', mathematician: 'Pythagoras', year: -500, description: 'The foundation of geometry' },
-  { text: '∫e^(-x²)dx = √π', name: 'Gaussian Integral', mathematician: 'Carl Friedrich Gauss', year: 1809, description: 'A transcendental result of profound beauty' },
-  { text: 'F = ma', name: "Newton's Second Law", mathematician: 'Isaac Newton', year: 1687, description: 'The foundation of classical mechanics' },
-  { text: 'E = mc²', name: 'Mass-Energy Equivalence', mathematician: 'Albert Einstein', year: 1905, description: 'The most famous equation in physics' },
-  { text: '∇ × E = -∂B/∂t', name: "Faraday's Law", mathematician: 'James Clerk Maxwell', year: 1865, description: 'Electromagnetic induction' },
-  { text: 'ζ(s) = Σ 1/n^s', name: 'Riemann Zeta Function', mathematician: 'Bernhard Riemann', year: 1859, description: 'The key to prime distribution' },
-  { text: 'π(x) ~ x/ln(x)', name: 'Prime Number Theorem', mathematician: 'Hadamard', year: 1896, description: 'The distribution of prime numbers' },
-];
+// Select a random featured theorem
+const getRandomTheorem = () => {
+  const index = Math.floor(Math.random() * featuredTheorems.length);
+  return featuredTheorems[index];
+};
 
 export default function ChalkboardHero() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const chalkRef = useRef<HTMLDivElement>(null);
+  const katexRef = useRef<HTMLDivElement>(null);
+  const dustCanvasRef = useRef<HTMLCanvasElement>(null);
   const infoRef = useRef<HTMLDivElement>(null);
+  const chalkRef = useRef<HTMLDivElement>(null);
+  const revealMaskRef = useRef<HTMLDivElement>(null);
 
-  // Use refs for all animation state to avoid re-renders
-  const animationRef = useRef<number>(0);
-  const particlesRef = useRef<ChalkParticle[]>([]);
-  const equationRef = useRef(displayEquations[Math.floor(Math.random() * displayEquations.length)]);
-  const stateRef = useRef({
-    charIndex: 0,
-    charProgress: 0,
-    currentX: 0,
-    lastX: 0,
-    lastY: 0,
-    isWriting: false,
-    isComplete: false,
-    startX: 0,
-    centerY: 0,
-    charWidths: [] as number[],
-    text: '',
-    initialized: false,
-  });
+  const [theorem] = useState(getRandomTheorem);
+  const [animationPhase, setAnimationPhase] = useState<'waiting' | 'writing' | 'complete'>('waiting');
+  const [revealProgress, setRevealProgress] = useState(0);
 
-  // Draw chalk bristle effect
-  const drawChalkBristles = useCallback((
-    ctx: CanvasRenderingContext2D,
-    x: number,
-    y: number,
-    pressure: number = 1
-  ) => {
-    const bristleCount = 12 + Math.floor(Math.random() * 6);
-    const spread = 7 * pressure;
+  const dustParticlesRef = useRef<ChalkDustParticle[]>([]);
+  const animationFrameRef = useRef<number>(0);
+  const chalkAnimFrameRef = useRef<number>(0);
 
-    for (let i = 0; i < bristleCount; i++) {
-      const angle = (i / bristleCount) * Math.PI * 2 + Math.random() * 0.5;
-      const distance = Math.random() * spread * (0.4 + Math.random() * 0.6);
-      const offsetX = Math.cos(angle) * distance + (Math.random() - 0.5) * 2.5;
-      const offsetY = Math.sin(angle) * distance + (Math.random() - 0.5) * 2.5;
-      const size = (0.5 + Math.random() * 1.5) * pressure;
-      const opacity = (0.3 + Math.random() * 0.5) * pressure;
-
-      ctx.beginPath();
-      ctx.arc(x + offsetX, y + offsetY, size, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(245, 245, 240, ${opacity})`;
-      ctx.fill();
+  // Render KaTeX equation
+  useEffect(() => {
+    if (katexRef.current && theorem) {
+      try {
+        katex.render(theorem.latex, katexRef.current, {
+          displayMode: true,
+          throwOnError: false,
+          trust: true,
+        });
+      } catch (error) {
+        console.error('KaTeX error:', error);
+        if (katexRef.current) {
+          katexRef.current.textContent = theorem.latex;
+        }
+      }
     }
+  }, [theorem]);
 
-    // Spawn dust particles occasionally
-    if (Math.random() > 0.75) {
-      particlesRef.current.push({
+  // Update theorem info display
+  useEffect(() => {
+    if (infoRef.current && theorem) {
+      const year = theorem.year ?? 0;
+      const yearDisplay = year > 0 ? year : `${Math.abs(year)} BCE`;
+      const description = theorem.description ?? '';
+      const mathematician = theorem.mathematician ?? 'Unknown';
+
+      infoRef.current.innerHTML = `
+        <p class="font-heading text-xl text-gold-leaf tracking-wide">${theorem.name}</p>
+        ${description ? `<p class="font-decorative text-sm text-parchment-aged italic max-w-xl mx-auto mt-2">${description}</p>` : ''}
+        <p class="font-body text-xs text-brass-tarnished tracking-wider mt-2">— ${mathematician}${year !== 0 ? `, ${yearDisplay}` : ''}</p>
+      `;
+    }
+  }, [theorem]);
+
+  // Spawn dust particle
+  const spawnDust = useCallback((x: number, y: number) => {
+    for (let i = 0; i < 2; i++) {
+      dustParticlesRef.current.push({
         x,
         y,
-        vx: (Math.random() - 0.5) * 2.5,
-        vy: -Math.random() * 2.5 - 0.5,
-        size: Math.random() * 2.5 + 0.5,
-        opacity: Math.random() * 0.6 + 0.3,
-        life: 80 + Math.random() * 50,
+        vx: (Math.random() - 0.5) * 1.2,
+        vy: -Math.random() * 1.2 - 0.2,
+        size: Math.random() * 1.5 + 0.5,
+        opacity: Math.random() * 0.35 + 0.15,
+        life: 50 + Math.random() * 30,
       });
     }
   }, []);
 
-  // Draw stroke between two points
-  const drawChalkStroke = useCallback((
-    ctx: CanvasRenderingContext2D,
-    fromX: number,
-    fromY: number,
-    toX: number,
-    toY: number,
-    pressure: number = 1
-  ) => {
-    const dist = Math.hypot(toX - fromX, toY - fromY);
-    const steps = Math.max(Math.ceil(dist / 2), 1);
-
-    for (let i = 0; i <= steps; i++) {
-      const t = i / steps;
-      const tremor = Math.sin(t * Math.PI * 5) * 0.4;
-      const x = fromX + (toX - fromX) * t + tremor;
-      const y = fromY + (toY - fromY) * t + tremor * 0.5;
-      const strokePressure = pressure * (0.75 + Math.sin(t * Math.PI) * 0.25);
-      drawChalkBristles(ctx, x, y, strokePressure);
-    }
-  }, [drawChalkBristles]);
-
-  // Update particles
-  const updateParticles = useCallback((ctx: CanvasRenderingContext2D) => {
-    particlesRef.current = particlesRef.current.filter((p) => {
-      p.x += p.vx;
-      p.y += p.vy;
-      p.vy += 0.03;
-      p.vx *= 0.98;
-      p.life--;
-      p.opacity *= 0.97;
-
-      if (p.life > 0 && p.opacity > 0.01) {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size * (p.life / 80), 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(245, 245, 240, ${p.opacity * 0.5})`;
-        ctx.fill();
-        return true;
-      }
-      return false;
-    });
-  }, []);
-
-  // Update chalk position
-  const updateChalkPosition = useCallback((x: number, y: number, angle: number, visible: boolean) => {
-    if (chalkRef.current) {
-      chalkRef.current.style.left = `${x}px`;
-      chalkRef.current.style.top = `${y}px`;
-      chalkRef.current.style.transform = `rotate(${angle}deg) translateX(-50%)`;
-      chalkRef.current.style.opacity = visible ? '1' : '0';
-    }
-  }, []);
-
-  // Update theorem info
-  const updateInfo = useCallback(() => {
-    if (infoRef.current) {
-      const eq = equationRef.current;
-      infoRef.current.innerHTML = `
-        <p class="font-heading text-xl text-gold-leaf tracking-wide">${eq.name}</p>
-        <p class="font-decorative text-sm text-parchment-aged italic max-w-xl mx-auto mt-2">${eq.description}</p>
-        <p class="font-body text-xs text-brass-tarnished tracking-wider mt-2">— ${eq.mathematician}, ${eq.year > 0 ? eq.year : Math.abs(eq.year) + ' BCE'}</p>
-      `;
-    }
-  }, []);
-
+  // Setup and animate dust particles
   useEffect(() => {
-    const canvas = canvasRef.current;
+    const canvas = dustCanvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Setup canvas
     const setupCanvas = () => {
       const rect = container.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
@@ -179,133 +112,115 @@ export default function ChalkboardHero() {
     };
 
     const rect = setupCanvas();
-    const state = stateRef.current;
 
-    // Initialize text metrics
-    const text = equationRef.current.text;
-    state.text = text;
-
-    const fontSize = Math.min(rect.width / 14, 52);
-    ctx.font = `500 ${fontSize}px 'Cormorant Garamond', Georgia, serif`;
-
-    const metrics = ctx.measureText(text);
-    const textWidth = metrics.width;
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2 - 20;
-
-    state.startX = centerX - textWidth / 2;
-    state.currentX = state.startX;
-    state.lastX = state.startX;
-    state.lastY = centerY;
-    state.centerY = centerY;
-    state.charIndex = 0;
-    state.charProgress = 0;
-    state.isWriting = false;
-    state.isComplete = false;
-    state.charWidths = [];
-
-    // Pre-calculate character widths
-    for (let i = 0; i < text.length; i++) {
-      state.charWidths.push(ctx.measureText(text[i]).width);
-    }
-
-    // Clear canvas
-    ctx.clearRect(0, 0, rect.width, rect.height);
-
-    // Update info display
-    updateInfo();
-
-    // Animation loop
     const animate = () => {
-      const state = stateRef.current;
+      ctx.clearRect(0, 0, rect.width, rect.height);
 
-      // Subtle fade for particle trails
-      ctx.fillStyle = 'rgba(20, 31, 26, 0.015)';
-      ctx.fillRect(0, 0, rect.width, rect.height);
+      dustParticlesRef.current = dustParticlesRef.current.filter((p) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.015;
+        p.vx *= 0.995;
+        p.life--;
+        p.opacity *= 0.985;
 
-      // Update and draw particles
-      updateParticles(ctx);
-
-      if (state.isWriting && !state.isComplete && state.charIndex < state.text.length) {
-        const char = state.text[state.charIndex];
-        const charWidth = state.charWidths[state.charIndex];
-
-        // Calculate stroke position
-        const strokeX = state.currentX + charWidth * state.charProgress;
-        const wobble = Math.sin(state.charProgress * Math.PI * 3) * 1.5;
-        const strokeY = state.centerY + wobble;
-
-        // Draw stroke
-        if (state.charProgress > 0.05) {
-          drawChalkStroke(ctx, state.lastX, state.lastY, strokeX, strokeY, 0.9);
+        if (p.life > 0 && p.opacity > 0.01) {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size * (p.life / 50), 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(245, 245, 240, ${p.opacity})`;
+          ctx.fill();
+          return true;
         }
+        return false;
+      });
 
-        state.lastX = strokeX;
-        state.lastY = strokeY;
-
-        // Update chalk position
-        const chalkAngle = -28 + Math.sin(state.charProgress * Math.PI * 4) * 10;
-        updateChalkPosition(strokeX, strokeY - 55, chalkAngle, true);
-
-        state.charProgress += 0.065;
-
-        if (state.charProgress >= 1) {
-          // Draw complete character
-          ctx.save();
-          ctx.font = `500 ${Math.min(rect.width / 14, 52)}px 'Cormorant Garamond', Georgia, serif`;
-          ctx.fillStyle = 'rgba(245, 245, 240, 0.92)';
-          ctx.shadowColor = 'rgba(245, 245, 240, 0.35)';
-          ctx.shadowBlur = 5;
-          ctx.fillText(char, state.currentX, state.centerY);
-          ctx.restore();
-
-          // Move to next character
-          state.currentX += charWidth + (char === ' ' ? 8 : 3);
-          state.charIndex++;
-          state.charProgress = 0;
-          state.lastX = state.currentX;
-          state.lastY = state.centerY;
-        }
-      } else if (state.isWriting && state.charIndex >= state.text.length && !state.isComplete) {
-        // Writing complete
-        state.isComplete = true;
-
-        // Move chalk to rest position
-        setTimeout(() => {
-          updateChalkPosition(rect.width - 90, rect.height - 50, 78, true);
-        }, 400);
-      }
-
-      // Continue animation if writing or particles exist
-      if ((state.isWriting && !state.isComplete) || particlesRef.current.length > 0) {
-        animationRef.current = requestAnimationFrame(animate);
-      } else if (state.isComplete) {
-        // Keep a slow animation going for any remaining particles
-        if (particlesRef.current.length > 0) {
-          animationRef.current = requestAnimationFrame(animate);
-        }
+      if (animationPhase !== 'complete' || dustParticlesRef.current.length > 0) {
+        animationFrameRef.current = requestAnimationFrame(animate);
       }
     };
 
-    // Start writing after delay
-    const startTimeout = setTimeout(() => {
-      state.isWriting = true;
-      updateChalkPosition(state.startX, state.centerY - 55, -30, true);
-      animate();
-    }, 1000);
+    animate();
 
-    // Handle resize
-    const handleResize = () => {
-      setupCanvas();
-    };
+    const handleResize = () => setupCanvas();
     window.addEventListener('resize', handleResize);
 
     return () => {
-      clearTimeout(startTimeout);
-      cancelAnimationFrame(animationRef.current);
+      cancelAnimationFrame(animationFrameRef.current);
       window.removeEventListener('resize', handleResize);
     };
-  }, [drawChalkStroke, updateParticles, updateChalkPosition, updateInfo]);
+  }, [animationPhase]);
+
+  // Main writing animation
+  useEffect(() => {
+    const startDelay = setTimeout(() => {
+      setAnimationPhase('writing');
+
+      const duration = 3500; // 3.5 seconds
+      const startTime = performance.now();
+
+      const animateReveal = (currentTime: number) => {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // Easing function for smooth reveal
+        const eased = 1 - Math.pow(1 - progress, 3);
+        setRevealProgress(eased);
+
+        // Spawn dust particles at the writing edge
+        if (containerRef.current && progress < 1 && Math.random() > 0.7) {
+          const rect = containerRef.current.getBoundingClientRect();
+          const writeX = rect.width * 0.15 + eased * rect.width * 0.7;
+          const writeY = rect.height * 0.45 + (Math.random() - 0.5) * 30;
+          spawnDust(writeX, writeY);
+        }
+
+        if (progress < 1) {
+          chalkAnimFrameRef.current = requestAnimationFrame(animateReveal);
+        } else {
+          setAnimationPhase('complete');
+        }
+      };
+
+      chalkAnimFrameRef.current = requestAnimationFrame(animateReveal);
+    }, 800);
+
+    return () => {
+      clearTimeout(startDelay);
+      cancelAnimationFrame(chalkAnimFrameRef.current);
+    };
+  }, [spawnDust]);
+
+  // Chalk stick position animation
+  useEffect(() => {
+    const chalk = chalkRef.current;
+    const container = containerRef.current;
+    if (!chalk || !container) return;
+
+    const rect = container.getBoundingClientRect();
+    const startX = rect.width * 0.12;
+    const endX = rect.width * 0.88;
+    const centerY = rect.height * 0.45;
+
+    if (animationPhase === 'waiting') {
+      chalk.style.opacity = '0';
+    } else if (animationPhase === 'writing') {
+      chalk.style.opacity = '1';
+
+      const x = startX + revealProgress * (endX - startX);
+      const wobbleY = Math.sin(revealProgress * Math.PI * 8) * 2;
+      const wobbleAngle = Math.sin(revealProgress * Math.PI * 6) * 6;
+
+      chalk.style.left = `${x}px`;
+      chalk.style.top = `${centerY + wobbleY - 50}px`;
+      chalk.style.transform = `rotate(${-25 + wobbleAngle}deg) translateX(-50%)`;
+    } else if (animationPhase === 'complete') {
+      // Smooth transition to rest
+      chalk.style.transition = 'all 0.5s ease-out';
+      chalk.style.left = `${rect.width - 80}px`;
+      chalk.style.top = `${rect.height - 45}px`;
+      chalk.style.transform = 'rotate(75deg) translateX(-50%)';
+    }
+  }, [animationPhase, revealProgress]);
 
   return (
     <section id="hero" className="relative min-h-screen flex items-center justify-center py-20 px-6 overflow-hidden">
@@ -359,102 +274,204 @@ export default function ChalkboardHero() {
             `,
           }}
         >
-          {/* Slate texture */}
+          {/* Slate texture overlay */}
           <div
-            className="absolute inset-0 pointer-events-none opacity-25"
+            className="absolute inset-0 pointer-events-none opacity-15"
             style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
               mixBlendMode: 'overlay',
             }}
           />
 
-          {/* Light reflection */}
+          {/* Subtle light reflection at top */}
           <div
-            className="absolute top-0 left-0 right-0 h-28 pointer-events-none"
+            className="absolute top-0 left-0 right-0 h-24 pointer-events-none"
             style={{
-              background: 'linear-gradient(180deg, rgba(255,255,255,0.02) 0%, transparent 100%)',
+              background: 'linear-gradient(180deg, rgba(255,255,255,0.015) 0%, transparent 100%)',
             }}
           />
 
-          {/* Worn area */}
+          {/* Worn chalk area (subtle) */}
           <div
-            className="absolute pointer-events-none opacity-8"
-            style={{
-              top: '18%', left: '12%', width: '35%', height: '45%',
-              background: 'radial-gradient(ellipse, rgba(255,255,255,0.08) 0%, transparent 65%)',
-            }}
-          />
-
-          {/* Canvas */}
-          <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
-
-          {/* Hagoromo chalk */}
-          <div
-            ref={chalkRef}
             className="absolute pointer-events-none"
             style={{
-              opacity: 0,
-              transition: 'opacity 0.3s ease-out',
+              top: '20%', left: '15%', width: '30%', height: '40%',
+              background: 'radial-gradient(ellipse, rgba(255,255,255,0.04) 0%, transparent 60%)',
             }}
-          >
-            <div className="relative">
+          />
+
+          {/* Dust particles canvas */}
+          <canvas
+            ref={dustCanvasRef}
+            className="absolute inset-0 w-full h-full pointer-events-none z-20"
+          />
+
+          {/* KaTeX equation with reveal animation */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div
+              ref={revealMaskRef}
+              className="relative overflow-hidden px-8"
+              style={{
+                clipPath: `inset(0 ${100 - revealProgress * 100}% 0 0)`,
+              }}
+            >
               <div
-                className="w-4 h-16 rounded-full relative overflow-hidden"
+                ref={katexRef}
+                className="katex-chalk"
                 style={{
-                  background: `linear-gradient(90deg, #D8D8D0 0%, #F5F5F0 20%, #FFFFFF 40%, #F5F5F0 60%, #E8E8E0 80%, #D0D0C8 100%)`,
-                  boxShadow: `inset 3px 0 6px rgba(255,255,255,0.6), inset -3px 0 6px rgba(0,0,0,0.15), 0 3px 10px rgba(0,0,0,0.4)`,
+                  color: '#F5F5F0',
+                  fontSize: 'clamp(1.2rem, 3vw, 2.2rem)',
+                  textShadow: `
+                    0 0 8px rgba(245, 245, 240, 0.4),
+                    0 0 16px rgba(245, 245, 240, 0.2),
+                    1px 1px 2px rgba(0, 0, 0, 0.3)
+                  `,
+                  filter: 'url(#chalkFilter)',
                 }}
-              >
-                <div
-                  className="absolute inset-0 opacity-25"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-                  }}
-                />
-                <div
-                  className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3.5 h-4 rounded-b-full"
-                  style={{ background: 'linear-gradient(180deg, #E8E8E0 0%, #B8B8B0 100%)' }}
-                />
-              </div>
-              <div
-                className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-6 h-2 rounded-full"
-                style={{ background: 'rgba(0,0,0,0.35)', filter: 'blur(3px)' }}
               />
             </div>
           </div>
 
-          {/* Chalk ledge */}
+          {/* SVG filter for chalk texture */}
+          <svg className="absolute w-0 h-0" aria-hidden="true">
+            <defs>
+              <filter id="chalkFilter" x="-10%" y="-10%" width="120%" height="120%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" seed="1" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.5" xChannelSelector="R" yChannelSelector="G" />
+              </filter>
+            </defs>
+          </svg>
+
+          {/* Hagoromo chalk stick */}
           <div
-            className="absolute bottom-0 left-0 right-0 h-10"
+            ref={chalkRef}
+            className="absolute pointer-events-none z-30"
             style={{
-              background: `linear-gradient(180deg, #6B5344 0%, #5C4033 20%, #4A3728 50%, #3D2B1F 80%, #2D1F15 100%)`,
-              boxShadow: `inset 0 3px 6px rgba(255,255,255,0.12), inset 0 -3px 8px rgba(0,0,0,0.4)`,
+              opacity: 0,
+              transition: 'opacity 0.3s ease',
             }}
           >
-            <div className="absolute inset-0 opacity-20" style={{
-              backgroundImage: `repeating-linear-gradient(90deg, transparent 0px, transparent 20px, rgba(0,0,0,0.1) 20px, rgba(0,0,0,0.1) 21px)`,
-            }} />
-            <div className="absolute inset-x-0 top-0 h-1.5" style={{
-              background: 'linear-gradient(180deg, rgba(245,245,240,0.2) 0%, rgba(245,245,240,0.05) 100%)',
-            }} />
-            {/* Chalk pieces */}
-            <div className="absolute bottom-2 right-20 w-2.5 h-8 rounded-full opacity-70" style={{
-              background: 'linear-gradient(90deg, #E8E8E0 0%, #F8F8F4 50%, #E8E8E0 100%)',
-              transform: 'rotate(12deg)', boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
-            }} />
-            <div className="absolute bottom-2 right-32 w-2 h-5 rounded-full opacity-50" style={{
-              background: 'linear-gradient(90deg, #F5E6A3 0%, #FFF5C3 50%, #F5E6A3 100%)',
-              transform: 'rotate(-8deg)', boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
-            }} />
-            <div className="absolute bottom-2 left-16 w-1.5 h-3 rounded-full opacity-40" style={{
-              background: 'linear-gradient(90deg, #C4D8C4 0%, #D8ECD8 50%, #C4D8C4 100%)',
-              transform: 'rotate(25deg)', boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
-            }} />
+            <div className="relative">
+              {/* Main chalk body */}
+              <div
+                className="w-3.5 h-14 rounded-full relative overflow-hidden"
+                style={{
+                  background: `linear-gradient(90deg,
+                    #D0D0C8 0%,
+                    #E8E8E0 15%,
+                    #F5F5F0 30%,
+                    #FFFFFF 50%,
+                    #F5F5F0 70%,
+                    #E8E8E0 85%,
+                    #D0D0C8 100%
+                  )`,
+                  boxShadow: `
+                    inset 2px 0 4px rgba(255,255,255,0.7),
+                    inset -2px 0 4px rgba(0,0,0,0.1),
+                    0 2px 8px rgba(0,0,0,0.35)
+                  `,
+                }}
+              >
+                {/* Chalk texture */}
+                <div
+                  className="absolute inset-0 opacity-20"
+                  style={{
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+                  }}
+                />
+                {/* Worn tip */}
+                <div
+                  className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3 h-3 rounded-b-full"
+                  style={{
+                    background: 'linear-gradient(180deg, #E8E8E0 0%, #C8C8C0 100%)',
+                  }}
+                />
+              </div>
+              {/* Shadow */}
+              <div
+                className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-5 h-1.5 rounded-full"
+                style={{
+                  background: 'rgba(0,0,0,0.3)',
+                  filter: 'blur(2px)',
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Chalk ledge/tray */}
+          <div
+            className="absolute bottom-0 left-0 right-0 h-9"
+            style={{
+              background: `linear-gradient(180deg,
+                #6B5344 0%,
+                #5C4033 25%,
+                #4A3728 55%,
+                #3D2B1F 80%,
+                #2D1F15 100%
+              )`,
+              boxShadow: `
+                inset 0 2px 4px rgba(255,255,255,0.1),
+                inset 0 -2px 6px rgba(0,0,0,0.35)
+              `,
+            }}
+          >
+            {/* Wood grain lines */}
+            <div
+              className="absolute inset-0 opacity-15"
+              style={{
+                backgroundImage: `repeating-linear-gradient(90deg,
+                  transparent 0px,
+                  transparent 18px,
+                  rgba(0,0,0,0.15) 18px,
+                  rgba(0,0,0,0.15) 19px
+                )`,
+              }}
+            />
+            {/* Highlight edge */}
+            <div
+              className="absolute inset-x-0 top-0 h-1"
+              style={{
+                background: 'linear-gradient(180deg, rgba(245,245,240,0.15) 0%, rgba(245,245,240,0.03) 100%)',
+              }}
+            />
+
+            {/* Extra chalk pieces on ledge */}
+            <div
+              className="absolute bottom-1.5 right-16 w-2 h-7 rounded-full opacity-65"
+              style={{
+                background: 'linear-gradient(90deg, #E0E0D8 0%, #F0F0E8 50%, #E0E0D8 100%)',
+                transform: 'rotate(15deg)',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.25)',
+              }}
+            />
+            <div
+              className="absolute bottom-1.5 right-28 w-1.5 h-4 rounded-full opacity-45"
+              style={{
+                background: 'linear-gradient(90deg, #F5E8A8 0%, #FFF8C8 50%, #F5E8A8 100%)',
+                transform: 'rotate(-10deg)',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.25)',
+              }}
+            />
+            <div
+              className="absolute bottom-1.5 left-12 w-1 h-2.5 rounded-full opacity-35"
+              style={{
+                background: 'linear-gradient(90deg, #C8D8C8 0%, #E0F0E0 50%, #C8D8C8 100%)',
+                transform: 'rotate(20deg)',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.25)',
+              }}
+            />
           </div>
         </div>
 
-        {/* Theorem info */}
-        <div ref={infoRef} className="text-center mt-10 space-y-1" />
+        {/* Theorem information */}
+        <div
+          ref={infoRef}
+          className="text-center mt-10 space-y-1"
+          style={{
+            opacity: animationPhase === 'complete' ? 1 : 0.3,
+            transition: 'opacity 0.8s ease-out',
+          }}
+        />
 
         {/* Scroll indicator */}
         <div className="flex justify-center mt-14 animate-float">
