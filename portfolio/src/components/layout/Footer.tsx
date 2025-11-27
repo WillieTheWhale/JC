@@ -1,109 +1,120 @@
 'use client';
 
-import { TraceryDivider, Trefoil } from '@/components/gothic';
-import { Github, Mail, Linkedin } from 'lucide-react';
+import { Github, Mail, Twitter } from 'lucide-react';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="relative bg-sage-800 text-chalk pt-12 pb-8">
-      {/* Gothic silhouette at top */}
-      <div className="absolute top-0 left-0 right-0 h-16 overflow-hidden">
+    <footer className="relative bg-walnut-deep overflow-hidden">
+      {/* Gothic architectural silhouette at top */}
+      <div className="absolute top-0 left-0 right-0 h-24 overflow-hidden">
         <svg
-          viewBox="0 0 1200 60"
+          viewBox="0 0 1200 80"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className="absolute bottom-0 w-full"
+          className="absolute bottom-0 w-full h-full"
           preserveAspectRatio="none"
         >
-          {/* Flying buttress silhouettes */}
+          {/* Flying buttress and spire silhouettes */}
           <path
-            d="M0 60 L0 40 Q100 20 200 40 L200 60 M200 60 L200 30 Q250 10 300 30 L300 60 M300 60 L300 35 Q400 5 500 35 L500 60 M500 60 L500 25 Q550 0 600 25 L600 60 M600 60 L600 25 Q650 0 700 25 L700 60 M700 60 L700 35 Q800 5 900 35 L900 60 M900 60 L900 30 Q950 10 1000 30 L1000 60 M1000 60 L1000 40 Q1100 20 1200 40 L1200 60"
-            fill="var(--color-off-white)"
+            d="M0 80 L0 50 Q50 30 100 50 L100 80
+               M100 80 L100 40 Q150 15 200 40 L200 80
+               M200 80 L200 35 Q250 5 300 35 L300 80
+               M300 80 L300 25 Q350 0 400 25 L400 80
+               M400 80 L400 20 Q450 0 500 20 L500 80
+               M500 80 L500 15 Q550 0 600 15 L600 80
+               M600 80 L600 15 Q650 0 700 15 L700 80
+               M700 80 L700 20 Q750 0 800 20 L800 80
+               M800 80 L800 25 Q850 0 900 25 L900 80
+               M900 80 L900 35 Q950 5 1000 35 L1000 80
+               M1000 80 L1000 40 Q1050 15 1100 40 L1100 80
+               M1100 80 L1100 50 Q1150 30 1200 50 L1200 80"
+            fill="#2D1810"
           />
         </svg>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6">
-        {/* Decorative divider */}
-        <div className="flex justify-center mb-8">
-          <TraceryDivider variant="ornate" width={300} color="#7A8B7A" />
-        </div>
+      {/* Main content */}
+      <div className="relative pt-32 pb-12 px-6">
+        <div className="max-w-5xl mx-auto">
+          {/* Decorative divider with quatrefoil */}
+          <div className="flex items-center justify-center gap-6 mb-12">
+            <div
+              className="flex-1 h-px max-w-[200px]"
+              style={{
+                background: 'linear-gradient(90deg, transparent 0%, var(--color-brass-tarnished) 100%)',
+              }}
+            />
+            <svg viewBox="0 0 40 40" className="w-10 h-10" fill="none">
+              <circle cx="20" cy="10" r="7" stroke="#8B7355" strokeWidth="1" />
+              <circle cx="30" cy="20" r="7" stroke="#8B7355" strokeWidth="1" />
+              <circle cx="20" cy="30" r="7" stroke="#8B7355" strokeWidth="1" />
+              <circle cx="10" cy="20" r="7" stroke="#8B7355" strokeWidth="1" />
+            </svg>
+            <div
+              className="flex-1 h-px max-w-[200px]"
+              style={{
+                background: 'linear-gradient(90deg, var(--color-brass-tarnished) 0%, transparent 100%)',
+              }}
+            />
+          </div>
 
-        <div className="grid md:grid-cols-3 gap-8 mb-8">
-          {/* About */}
-          <div>
-            <h3 className="font-heading text-xl mb-4 flex items-center gap-2">
-              <Trefoil size={24} color="#C4A35A" hiddenSymbol="π" />
-              About
-            </h3>
-            <p className="text-sage-300 text-sm leading-relaxed">
-              A mathematics student passionate about algebraic topology,
-              category theory, and the beauty of abstract structures.
+          {/* Quote */}
+          <blockquote className="text-center mb-12">
+            <p className="font-decorative text-xl italic text-parchment-aged/80 mb-3">
+              &ldquo;Mathematics is the music of reason.&rdquo;
+            </p>
+            <cite className="text-brass text-sm not-italic">
+              &mdash; James Joseph Sylvester
+            </cite>
+          </blockquote>
+
+          {/* Social links */}
+          <div className="flex justify-center gap-6 mb-12">
+            {[
+              { href: 'mailto:john@example.com', icon: Mail, label: 'Email' },
+              { href: 'https://github.com/johnchristopher', icon: Github, label: 'GitHub' },
+              { href: 'https://twitter.com/johnchristopher', icon: Twitter, label: 'Twitter' },
+            ].map((social) => (
+              <a
+                key={social.label}
+                href={social.href}
+                target={social.href.startsWith('http') ? '_blank' : undefined}
+                rel={social.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                className="group p-3 rounded-full transition-all duration-300"
+                style={{
+                  background: 'linear-gradient(145deg, rgba(92, 64, 51, 0.5) 0%, rgba(74, 55, 40, 0.5) 100%)',
+                }}
+                aria-label={social.label}
+              >
+                <social.icon
+                  size={20}
+                  className="text-brass transition-colors duration-300 group-hover:text-gold"
+                />
+              </a>
+            ))}
+          </div>
+
+          {/* Copyright */}
+          <div className="text-center">
+            <p className="text-brass-tarnished text-sm">
+              {currentYear} John Christopher
+            </p>
+            <p className="text-brass-tarnished/50 text-xs mt-2">
+              Built with mathematical precision
             </p>
           </div>
-
-          {/* Quick Links */}
-          <div>
-            <h3 className="font-heading text-xl mb-4">Quick Links</h3>
-            <ul className="space-y-2 text-sm">
-              {['CV', 'Projects', 'Research', 'Blog'].map((link) => (
-                <li key={link}>
-                  <a
-                    href={`/${link.toLowerCase()}`}
-                    className="text-sage-300 hover:text-gold transition-colors"
-                  >
-                    {link}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <h3 className="font-heading text-xl mb-4">Connect</h3>
-            <div className="flex gap-4">
-              <a
-                href="mailto:john@example.com"
-                className="p-2 rounded-full bg-sage-700 hover:bg-sage-600 transition-colors"
-                aria-label="Email"
-              >
-                <Mail size={20} />
-              </a>
-              <a
-                href="https://github.com/johnchristopher"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 rounded-full bg-sage-700 hover:bg-sage-600 transition-colors"
-                aria-label="GitHub"
-              >
-                <Github size={20} />
-              </a>
-              <a
-                href="https://linkedin.com/in/johnchristopher"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 rounded-full bg-sage-700 hover:bg-sage-600 transition-colors"
-                aria-label="LinkedIn"
-              >
-                <Linkedin size={20} />
-              </a>
-            </div>
-          </div>
-        </div>
-
-        {/* Copyright */}
-        <div className="border-t border-sage-700 pt-6 text-center">
-          <p className="text-sage-400 text-sm">
-            © {currentYear} John Christopher. Built with mathematical precision.
-          </p>
-          <p className="text-sage-500 text-xs mt-2 font-decorative italic">
-            &ldquo;Mathematics is the music of reason.&rdquo; — James Joseph Sylvester
-          </p>
         </div>
       </div>
+
+      {/* Bottom vignette */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
+        style={{
+          background: 'linear-gradient(0deg, rgba(13, 9, 6, 0.5) 0%, transparent 100%)',
+        }}
+      />
     </footer>
   );
 }

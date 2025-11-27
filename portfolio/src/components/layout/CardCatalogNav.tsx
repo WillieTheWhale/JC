@@ -1,27 +1,47 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { navItems } from '@/lib/data';
+import { useState, useEffect, useCallback } from 'react';
 import { Menu, X } from 'lucide-react';
+
+interface NavItem {
+  id: string;
+  label: string;
+  sublabel: string;
+  href: string;
+}
+
+const navItems: NavItem[] = [
+  { id: 'home', label: 'MAIN HALL', sublabel: 'Return to entrance', href: '#hero' },
+  { id: 'about', label: 'ABOUT', sublabel: 'The mathematician', href: '#about' },
+  { id: 'research', label: 'RESEARCH', sublabel: 'Academic pursuits', href: '#research' },
+  { id: 'projects', label: 'PROJECTS', sublabel: 'Mathematical works', href: '#projects' },
+  { id: 'writings', label: 'WRITINGS', sublabel: 'Favourite problems', href: '#writings' },
+  { id: 'chalkboard', label: 'CHALKBOARD', sublabel: 'Interactive studio', href: '#chalkboard' },
+];
 
 export default function CardCatalogNav() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const pathname = usePathname();
+  const [activeSection, setActiveSection] = useState('home');
 
+  // Handle scroll to detect active section
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    const handleScroll = () => {
+      const sections = navItems.map(item => item.href.replace('#', ''));
+      const scrollPosition = window.scrollY + 200;
+
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const section = document.getElementById(sections[i]);
+        if (section && section.offsetTop <= scrollPosition) {
+          setActiveSection(sections[i]);
+          break;
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  // Close menu when route changes
-  useEffect(() => {
-    setIsOpen(false);
-  }, [pathname]);
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -34,36 +54,90 @@ export default function CardCatalogNav() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen]);
 
+  // Smooth scroll to section
+  const scrollToSection = useCallback((href: string) => {
+    const id = href.replace('#', '');
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+    setIsOpen(false);
+  }, []);
+
   return (
     <>
-      {/* Toggle Button - Styled as drawer pull */}
+      {/* Mobile Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed z-50 transition-all duration-300 ${
-          isMobile
-            ? 'bottom-4 right-4 p-3 rounded-lg bg-sage-700 text-chalk shadow-elevated'
-            : 'top-1/2 -translate-y-1/2 left-0 w-[60px] h-[120px] bg-gradient-to-r from-amber-900 to-amber-800 rounded-r-lg shadow-drawer flex items-center justify-center'
-        }`}
+        className="fixed bottom-6 right-6 z-50 lg:hidden w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 shadow-elevated"
+        style={{
+          background: 'linear-gradient(145deg, #5C4033 0%, #3D2B1F 100%)',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
+        }}
         aria-label={isOpen ? 'Close navigation' : 'Open navigation'}
         aria-expanded={isOpen}
       >
-        {isMobile ? (
-          isOpen ? <X size={24} /> : <Menu size={24} />
+        {isOpen ? (
+          <X className="text-parchment" size={24} />
         ) : (
-          <div className="flex flex-col items-center gap-2">
-            {/* Brass handle */}
-            <div className="w-4 h-16 rounded-full bg-gradient-to-b from-brass-light via-brass to-brass-dark shadow-inner" />
-            <span className="text-[8px] text-cream/70 uppercase tracking-wider rotate-90 origin-center whitespace-nowrap">
-              {isOpen ? 'Close' : 'Menu'}
-            </span>
-          </div>
+          <Menu className="text-parchment" size={24} />
         )}
+      </button>
+
+      {/* Desktop Drawer Pull - Fixed to left edge */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`hidden lg:flex fixed top-1/2 -translate-y-1/2 z-50 transition-all duration-500 ease-weighted ${
+          isOpen ? 'left-[320px]' : 'left-0'
+        }`}
+        style={{
+          width: '48px',
+          height: '140px',
+        }}
+        aria-label={isOpen ? 'Close navigation' : 'Open navigation'}
+        aria-expanded={isOpen}
+      >
+        {/* Oak drawer edge */}
+        <div
+          className="w-full h-full rounded-r-lg flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:brightness-110"
+          style={{
+            background: `
+              linear-gradient(90deg,
+                #4A3728 0%,
+                #5C4033 20%,
+                #6B4C3A 50%,
+                #5C4033 80%,
+                #4A3728 100%
+              )
+            `,
+            boxShadow: '4px 0 20px rgba(0,0,0,0.4), inset -2px 0 4px rgba(0,0,0,0.2)',
+          }}
+        >
+          {/* Brass pull handle */}
+          <div
+            className="w-3 h-16 rounded-full"
+            style={{
+              background: 'linear-gradient(180deg, #A08565 0%, #8B7355 30%, #6B5344 70%, #8B7355 100%)',
+              boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.2), inset 0 -2px 4px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.3)',
+            }}
+          />
+          <span
+            className="text-parchment/60 text-[10px] tracking-widest uppercase"
+            style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
+          >
+            {isOpen ? 'CLOSE' : 'CATALOG'}
+          </span>
+        </div>
       </button>
 
       {/* Backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40"
+          className="fixed inset-0 z-40 transition-opacity duration-500"
+          style={{
+            background: 'radial-gradient(ellipse at center, rgba(13, 9, 6, 0.7) 0%, rgba(13, 9, 6, 0.9) 100%)',
+            backdropFilter: 'blur(4px)',
+          }}
           onClick={() => setIsOpen(false)}
           aria-hidden="true"
         />
@@ -71,36 +145,72 @@ export default function CardCatalogNav() {
 
       {/* Card Catalog Drawer */}
       <nav
-        className={`fixed z-40 transition-transform duration-500 ease-spring ${
-          isMobile
-            ? `bottom-0 left-0 right-0 transform ${
-                isOpen ? 'translate-y-0' : 'translate-y-full'
-              }`
-            : `top-0 left-0 h-full w-[320px] transform ${
-                isOpen ? 'translate-x-0' : '-translate-x-full'
-              }`
-        }`}
+        className={`fixed z-40 transition-transform duration-500 ease-weighted ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        } top-0 left-0 h-full w-[320px]`}
         aria-label="Main navigation"
       >
-        {/* Drawer body - Oak wood texture */}
+        {/* Drawer body - Oak wood with grain */}
         <div
-          className={`h-full bg-gradient-to-b from-amber-900 via-amber-800 to-amber-900 shadow-drawer overflow-hidden ${
-            isMobile ? 'rounded-t-2xl max-h-[70vh]' : ''
-          }`}
+          className="h-full overflow-hidden"
           style={{
-            backgroundImage: `
-              linear-gradient(90deg, rgba(0,0,0,0.1) 0%, transparent 10%, transparent 90%, rgba(0,0,0,0.1) 100%),
-              url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h100v100H0z' fill='%23854d0e' fill-opacity='0.1'/%3E%3Cpath d='M0 50h100' stroke='%23000' stroke-opacity='0.05'/%3E%3C/svg%3E")
+            background: `
+              linear-gradient(180deg,
+                #5C4033 0%,
+                #4A3728 20%,
+                #5C4033 40%,
+                #4A3728 60%,
+                #5C4033 80%,
+                #4A3728 100%
+              )
             `,
+            boxShadow: '4px 0 30px rgba(0,0,0,0.5)',
           }}
         >
+          {/* Wood grain texture overlay */}
+          <div
+            className="absolute inset-0 opacity-30 pointer-events-none"
+            style={{
+              backgroundImage: `
+                repeating-linear-gradient(
+                  90deg,
+                  transparent 0px,
+                  transparent 2px,
+                  rgba(0,0,0,0.03) 2px,
+                  rgba(0,0,0,0.03) 4px
+                ),
+                repeating-linear-gradient(
+                  0deg,
+                  transparent 0px,
+                  rgba(255,255,255,0.02) 1px,
+                  transparent 2px,
+                  transparent 30px
+                )
+              `,
+            }}
+          />
+
           {/* Header with brass label holder */}
-          <div className={`p-6 border-b border-amber-950/30 ${isMobile ? 'pt-4 pb-3' : ''}`}>
+          <div className="relative px-6 py-8 border-b border-black/20">
+            {/* Brass frame */}
             <div className="relative mx-auto w-fit">
-              {/* Brass frame */}
-              <div className="absolute -inset-2 bg-gradient-to-b from-brass-light via-brass to-brass-dark rounded opacity-80" />
-              <div className="relative bg-cream px-4 py-1">
-                <span className="font-mono text-xs text-charcoal tracking-widest uppercase">
+              <div
+                className="absolute -inset-3 rounded"
+                style={{
+                  background: 'linear-gradient(180deg, #A08565 0%, #8B7355 50%, #6B5344 100%)',
+                  boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.3), 0 2px 8px rgba(0,0,0,0.3)',
+                }}
+              />
+              <div
+                className="relative px-6 py-2"
+                style={{
+                  background: 'linear-gradient(180deg, #F5EFE0 0%, #E8DCC4 100%)',
+                }}
+              >
+                <span
+                  className="text-walnut-deep text-xs tracking-[0.3em] uppercase"
+                  style={{ fontFamily: 'Courier New, monospace' }}
+                >
                   Card Catalog
                 </span>
               </div>
@@ -108,71 +218,166 @@ export default function CardCatalogNav() {
           </div>
 
           {/* Navigation Cards */}
-          <div className={`p-4 space-y-3 overflow-y-auto ${isMobile ? 'max-h-[calc(70vh-80px)]' : 'h-[calc(100vh-100px)]'}`}>
+          <div className="p-6 space-y-4 overflow-y-auto h-[calc(100vh-120px)]">
             {navItems.map((item, index) => {
-              const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+              const isActive = activeSection === item.href.replace('#', '');
 
               return (
-                <Link
+                <button
                   key={item.id}
-                  href={item.href}
-                  className={`block group animate-stagger`}
-                  style={{ animationDelay: `${index * 50}ms` }}
+                  onClick={() => scrollToSection(item.href)}
+                  className="w-full text-left group"
+                  style={{
+                    animationDelay: `${index * 80}ms`,
+                  }}
                 >
                   <div
                     className={`relative transition-all duration-300 ${
                       isActive
-                        ? 'transform translate-x-2 translate-z-10'
-                        : 'hover:translate-y-[-2px] hover:shadow-card'
+                        ? 'translate-x-3 scale-[1.02]'
+                        : 'hover:translate-y-[-2px] hover:translate-x-1'
                     }`}
                   >
-                    {/* Card paper effect */}
+                    {/* Card paper */}
                     <div
-                      className={`relative p-4 rounded-sm ${
-                        isActive ? 'bg-cream shadow-card-hover' : 'bg-cream/90 hover:bg-cream'
-                      }`}
+                      className="relative p-4 rounded-sm overflow-hidden"
                       style={{
-                        transform: `rotate(${(Math.random() - 0.5) * 0.5}deg)`,
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='5'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper)'/%3E%3C/svg%3E")`,
-                        backgroundBlendMode: 'overlay',
+                        background: isActive
+                          ? 'linear-gradient(135deg, #FFFEF7 0%, #F5EFE0 100%)'
+                          : 'linear-gradient(135deg, #F5EFE0 0%, #E8DCC4 100%)',
+                        boxShadow: isActive
+                          ? '0 8px 20px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.2)'
+                          : '0 2px 8px rgba(0,0,0,0.2), 0 1px 3px rgba(0,0,0,0.1)',
+                        transform: `rotate(${(index % 2 === 0 ? 0.3 : -0.3)}deg)`,
                       }}
                     >
+                      {/* Paper texture */}
+                      <div
+                        className="absolute inset-0 opacity-50 pointer-events-none"
+                        style={{
+                          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper)' opacity='0.05'/%3E%3C/svg%3E")`,
+                        }}
+                      />
+
                       {/* Brass card holder at top */}
-                      <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-16 h-3 rounded-b-sm bg-gradient-to-b from-brass-light to-brass shadow-sm" />
+                      <div
+                        className="absolute -top-px left-1/2 -translate-x-1/2 w-20 h-3 rounded-b"
+                        style={{
+                          background: 'linear-gradient(180deg, #8B7355 0%, #6B5344 100%)',
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                        }}
+                      />
 
                       {/* Card content */}
-                      <div className="pt-2">
+                      <div className="pt-3 relative z-10">
                         <h3
-                          className={`font-mono text-sm tracking-wider ${
-                            isActive ? 'text-sage-700' : 'text-charcoal/80'
+                          className={`text-sm tracking-[0.2em] ${
+                            isActive ? 'text-walnut-deep' : 'text-walnut/80'
                           }`}
-                          style={{
-                            fontFamily: 'Courier New, monospace',
-                          }}
+                          style={{ fontFamily: 'Courier New, monospace' }}
                         >
                           {item.label}
                         </h3>
-                        <p className="text-xs text-charcoal/50 mt-1 italic font-decorative">
+                        <p className="text-xs text-sepia/60 mt-1 font-decorative italic">
                           {item.sublabel}
                         </p>
                       </div>
 
-                      {/* Active indicator */}
+                      {/* Active indicator - gold dot */}
                       {isActive && (
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-gold" />
+                        <div
+                          className="absolute right-4 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full"
+                          style={{
+                            background: 'linear-gradient(135deg, #D4AF37 0%, #C9A227 100%)',
+                            boxShadow: '0 0 8px rgba(201, 162, 39, 0.5)',
+                          }}
+                        />
                       )}
                     </div>
 
-                    {/* Card shadow/depth effect */}
-                    <div className="absolute inset-0 bg-amber-950/20 rounded-sm -z-10 translate-y-1 translate-x-1" />
+                    {/* Card shadow layer */}
+                    <div
+                      className="absolute inset-0 -z-10 rounded-sm"
+                      style={{
+                        background: 'rgba(0,0,0,0.2)',
+                        transform: 'translate(3px, 3px)',
+                        filter: 'blur(2px)',
+                      }}
+                    />
                   </div>
-                </Link>
+                </button>
               );
             })}
           </div>
 
-          {/* Footer with decorative element */}
-          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-amber-950 to-transparent pointer-events-none" />
+          {/* Decorative bottom gradient */}
+          <div
+            className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none"
+            style={{
+              background: 'linear-gradient(0deg, rgba(45, 24, 16, 0.8) 0%, transparent 100%)',
+            }}
+          />
+        </div>
+      </nav>
+
+      {/* Mobile Bottom Sheet */}
+      <nav
+        className={`fixed z-40 lg:hidden transition-transform duration-500 ease-weighted ${
+          isOpen ? 'translate-y-0' : 'translate-y-full'
+        } bottom-0 left-0 right-0 rounded-t-3xl overflow-hidden`}
+        style={{
+          maxHeight: '75vh',
+          background: 'linear-gradient(180deg, #5C4033 0%, #4A3728 100%)',
+          boxShadow: '0 -10px 40px rgba(0,0,0,0.5)',
+        }}
+        aria-label="Main navigation"
+      >
+        {/* Drag handle */}
+        <div className="flex justify-center py-4">
+          <div
+            className="w-12 h-1 rounded-full"
+            style={{ background: 'rgba(232, 220, 196, 0.3)' }}
+          />
+        </div>
+
+        {/* Navigation Cards */}
+        <div className="px-6 pb-24 space-y-3 overflow-y-auto max-h-[60vh]">
+          {navItems.map((item, index) => {
+            const isActive = activeSection === item.href.replace('#', '');
+
+            return (
+              <button
+                key={item.id}
+                onClick={() => scrollToSection(item.href)}
+                className="w-full text-left"
+              >
+                <div
+                  className={`p-4 rounded transition-all duration-300 ${
+                    isActive ? 'scale-[1.02]' : ''
+                  }`}
+                  style={{
+                    background: isActive
+                      ? 'linear-gradient(135deg, #FFFEF7 0%, #F5EFE0 100%)'
+                      : 'linear-gradient(135deg, #F5EFE0 0%, #E8DCC4 100%)',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                    transform: `rotate(${(index % 2 === 0 ? 0.2 : -0.2)}deg)`,
+                  }}
+                >
+                  <h3
+                    className={`text-sm tracking-[0.15em] ${
+                      isActive ? 'text-walnut-deep' : 'text-walnut/80'
+                    }`}
+                    style={{ fontFamily: 'Courier New, monospace' }}
+                  >
+                    {item.label}
+                  </h3>
+                  <p className="text-xs text-sepia/60 mt-0.5 font-decorative italic">
+                    {item.sublabel}
+                  </p>
+                </div>
+              </button>
+            );
+          })}
         </div>
       </nav>
     </>
