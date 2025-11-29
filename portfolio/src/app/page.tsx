@@ -1,6 +1,6 @@
 'use client';
 
-import { ChalkboardHero, InteractiveChalkboard } from '@/components/chalkboard';
+import { BlackboardHeroEnhanced, InteractiveChalkboard } from '@/components/chalkboard';
 import { IlluminatedHeader, JournalCard } from '@/components/ui';
 import { Github, ExternalLink, BookOpen, Mail, Scroll, FlaskConical, Pen } from 'lucide-react';
 
@@ -74,8 +74,8 @@ const writings = [
 export default function HomePage() {
   return (
     <div className="min-h-screen">
-      {/* Hero Section with Chalkboard */}
-      <ChalkboardHero />
+      {/* Hero Section with Enhanced Animated Blackboard */}
+      <BlackboardHeroEnhanced />
 
       {/* About Section */}
       <section id="about" className="relative py-24 px-6">
