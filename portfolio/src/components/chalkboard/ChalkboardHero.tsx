@@ -5,8 +5,8 @@ import katex from 'katex';
 import { featuredTheorems } from '@/lib/theorems';
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// CHALKBOARD HERO - Self-Writing Mathematical Proofs
-// Clean chalk writing animation without distortion effects
+// BLACKBOARD HERO - Self-Writing Mathematical Proofs
+// Stroke-based chalk animation with realistic chalk stick and dust particles
 // ═══════════════════════════════════════════════════════════════════════════════
 
 interface ChalkDustParticle {
@@ -17,6 +17,15 @@ interface ChalkDustParticle {
   size: number;
   opacity: number;
   life: number;
+  maxLife: number;
+}
+
+interface ChalkState {
+  x: number;
+  y: number;
+  rotation: number;
+  isWriting: boolean;
+  opacity: number;
 }
 
 // Select a random featured theorem
@@ -27,18 +36,25 @@ const getRandomTheorem = () => {
 
 export default function ChalkboardHero() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const boardRef = useRef<HTMLDivElement>(null);
   const katexRef = useRef<HTMLDivElement>(null);
   const dustCanvasRef = useRef<HTMLCanvasElement>(null);
   const infoRef = useRef<HTMLDivElement>(null);
-  const chalkRef = useRef<HTMLDivElement>(null);
 
   const [theorem] = useState(getRandomTheorem);
   const [animationPhase, setAnimationPhase] = useState<'waiting' | 'writing' | 'complete'>('waiting');
   const [revealProgress, setRevealProgress] = useState(0);
+  const [chalkState, setChalkState] = useState<ChalkState>({
+    x: 0,
+    y: 0,
+    rotation: -25,
+    isWriting: false,
+    opacity: 0,
+  });
 
   const dustParticlesRef = useRef<ChalkDustParticle[]>([]);
   const animationFrameRef = useRef<number>(0);
-  const chalkAnimFrameRef = useRef<number>(0);
+  const writingFrameRef = useRef<number>(0);
 
   // Render KaTeX equation
   useEffect(() => {
@@ -74,32 +90,36 @@ export default function ChalkboardHero() {
     }
   }, [theorem]);
 
-  // Spawn dust particle at position
-  const spawnDust = useCallback((x: number, y: number) => {
-    for (let i = 0; i < 3; i++) {
+  // Spawn dust particles at chalk tip
+  const spawnDust = useCallback((x: number, y: number, intensity: number = 1) => {
+    const particleCount = Math.floor(2 + Math.random() * 3 * intensity);
+    for (let i = 0; i < particleCount; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 0.5 + Math.random() * 1.5;
       dustParticlesRef.current.push({
         x,
         y,
-        vx: (Math.random() - 0.5) * 2,
-        vy: -Math.random() * 2 - 0.5,
-        size: Math.random() * 2 + 1,
-        opacity: Math.random() * 0.5 + 0.3,
-        life: 40 + Math.random() * 30,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 1, // Slight upward bias
+        size: 1 + Math.random() * 2,
+        opacity: 0.4 + Math.random() * 0.4,
+        life: 30 + Math.random() * 40,
+        maxLife: 70,
       });
     }
   }, []);
 
-  // Setup and animate dust particles on canvas
+  // Dust particle animation system
   useEffect(() => {
     const canvas = dustCanvasRef.current;
-    const container = containerRef.current;
-    if (!canvas || !container) return;
+    const board = boardRef.current;
+    if (!canvas || !board) return;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     const setupCanvas = () => {
-      const rect = container.getBoundingClientRect();
+      const rect = board.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
@@ -110,119 +130,127 @@ export default function ChalkboardHero() {
       return rect;
     };
 
-    const rect = setupCanvas();
+    let rect = setupCanvas();
 
     const animate = () => {
       ctx.clearRect(0, 0, rect.width, rect.height);
 
+      // Update and draw dust particles
       dustParticlesRef.current = dustParticlesRef.current.filter((p) => {
+        // Physics update
         p.x += p.vx;
         p.y += p.vy;
-        p.vy += 0.05; // gravity
-        p.vx *= 0.98;
+        p.vy += 0.08; // Gravity
+        p.vx *= 0.97; // Air resistance
         p.life--;
-        p.opacity *= 0.96;
 
-        if (p.life > 0 && p.opacity > 0.01) {
+        // Fade based on life
+        const lifeFraction = p.life / p.maxLife;
+        const currentOpacity = p.opacity * lifeFraction;
+
+        if (p.life > 0 && currentOpacity > 0.01) {
+          // Draw particle with soft edge
+          const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
+          gradient.addColorStop(0, `rgba(245, 245, 240, ${currentOpacity})`);
+          gradient.addColorStop(0.6, `rgba(245, 245, 240, ${currentOpacity * 0.5})`);
+          gradient.addColorStop(1, 'rgba(245, 245, 240, 0)');
+
           ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size * (p.life / 40), 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(245, 245, 240, ${p.opacity})`;
+          ctx.arc(p.x, p.y, p.size * (0.5 + lifeFraction * 0.5), 0, Math.PI * 2);
+          ctx.fillStyle = gradient;
           ctx.fill();
           return true;
         }
         return false;
       });
 
-      if (animationPhase !== 'complete' || dustParticlesRef.current.length > 0) {
-        animationFrameRef.current = requestAnimationFrame(animate);
-      }
+      animationFrameRef.current = requestAnimationFrame(animate);
     };
 
     animate();
 
-    const handleResize = () => setupCanvas();
+    const handleResize = () => {
+      rect = setupCanvas();
+    };
     window.addEventListener('resize', handleResize);
 
     return () => {
       cancelAnimationFrame(animationFrameRef.current);
       window.removeEventListener('resize', handleResize);
     };
-  }, [animationPhase]);
+  }, []);
 
-  // Main writing animation
+  // Main writing animation controller
   useEffect(() => {
+    const board = boardRef.current;
+    if (!board) return;
+
     const startDelay = setTimeout(() => {
       setAnimationPhase('writing');
 
-      const duration = 4000; // 4 seconds for writing
+      const rect = board.getBoundingClientRect();
+      const duration = 5000; // 5 seconds for full write
       const startTime = performance.now();
 
-      const animateReveal = (currentTime: number) => {
+      // Writing area bounds
+      const padding = 40;
+      const writeStartX = padding;
+      const writeEndX = rect.width - padding;
+      const writeY = rect.height * 0.48;
+
+      const animateWrite = (currentTime: number) => {
         const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
+        const rawProgress = Math.min(elapsed / duration, 1);
 
-        // Ease-out cubic for natural writing feel
-        const eased = 1 - Math.pow(1 - progress, 3);
-        setRevealProgress(eased);
+        // Ease-out for natural writing feel
+        const progress = 1 - Math.pow(1 - rawProgress, 2.5);
+        setRevealProgress(progress);
 
-        // Spawn dust particles at writing position
-        if (containerRef.current && progress < 1) {
-          const rect = containerRef.current.getBoundingClientRect();
-          const writeX = rect.width * 0.1 + eased * rect.width * 0.8;
-          const writeY = rect.height * 0.5 + (Math.random() - 0.5) * 40;
+        // Calculate chalk position along writing path
+        const writeX = writeStartX + progress * (writeEndX - writeStartX);
 
-          if (Math.random() > 0.6) {
-            spawnDust(writeX, writeY);
-          }
+        // Add natural hand wobble
+        const wobbleX = Math.sin(progress * Math.PI * 20) * 2;
+        const wobbleY = Math.sin(progress * Math.PI * 15) * 3 + Math.sin(progress * Math.PI * 7) * 2;
+        const wobbleRotation = Math.sin(progress * Math.PI * 12) * 5;
+
+        // Update chalk state
+        setChalkState({
+          x: writeX + wobbleX,
+          y: writeY + wobbleY,
+          rotation: -25 + wobbleRotation,
+          isWriting: true,
+          opacity: 1,
+        });
+
+        // Spawn dust at chalk tip (more frequent during actual writing)
+        if (rawProgress < 1 && Math.random() > 0.5) {
+          spawnDust(writeX + wobbleX, writeY + wobbleY + 30, 0.8);
         }
 
-        if (progress < 1) {
-          chalkAnimFrameRef.current = requestAnimationFrame(animateReveal);
+        if (rawProgress < 1) {
+          writingFrameRef.current = requestAnimationFrame(animateWrite);
         } else {
+          // Writing complete - move chalk to rest position
           setAnimationPhase('complete');
+          setChalkState((prev) => ({
+            ...prev,
+            x: rect.width - 60,
+            y: rect.height - 50,
+            rotation: 75,
+            isWriting: false,
+          }));
         }
       };
 
-      chalkAnimFrameRef.current = requestAnimationFrame(animateReveal);
-    }, 600);
+      writingFrameRef.current = requestAnimationFrame(animateWrite);
+    }, 800);
 
     return () => {
       clearTimeout(startDelay);
-      cancelAnimationFrame(chalkAnimFrameRef.current);
+      cancelAnimationFrame(writingFrameRef.current);
     };
   }, [spawnDust]);
-
-  // Chalk stick position animation
-  useEffect(() => {
-    const chalk = chalkRef.current;
-    const container = containerRef.current;
-    if (!chalk || !container) return;
-
-    const rect = container.getBoundingClientRect();
-    const startX = rect.width * 0.08;
-    const endX = rect.width * 0.92;
-    const centerY = rect.height * 0.5;
-
-    if (animationPhase === 'waiting') {
-      chalk.style.opacity = '0';
-    } else if (animationPhase === 'writing') {
-      chalk.style.opacity = '1';
-      chalk.style.transition = 'none';
-
-      const x = startX + revealProgress * (endX - startX);
-      const wobbleY = Math.sin(revealProgress * Math.PI * 12) * 3;
-      const wobbleAngle = Math.sin(revealProgress * Math.PI * 8) * 8;
-
-      chalk.style.left = `${x}px`;
-      chalk.style.top = `${centerY + wobbleY - 60}px`;
-      chalk.style.transform = `rotate(${-30 + wobbleAngle}deg) translateX(-50%)`;
-    } else if (animationPhase === 'complete') {
-      chalk.style.transition = 'all 0.6s ease-out';
-      chalk.style.left = `${rect.width - 70}px`;
-      chalk.style.top = `${rect.height - 40}px`;
-      chalk.style.transform = 'rotate(80deg) translateX(-50%)';
-    }
-  }, [animationPhase, revealProgress]);
 
   return (
     <section id="hero" className="relative min-h-screen flex items-center justify-center py-20 px-6 overflow-hidden">
@@ -245,7 +273,7 @@ export default function ChalkboardHero() {
         }}
       />
 
-      <div className="w-full max-w-5xl mx-auto relative z-10">
+      <div ref={containerRef} className="w-full max-w-5xl mx-auto relative z-10">
         {/* Title */}
         <div className="text-center mb-12 animate-fade-up">
           <h1 className="font-heading text-hero text-parchment tracking-wide mb-4">
@@ -261,7 +289,7 @@ export default function ChalkboardHero() {
 
         {/* Chalkboard */}
         <div
-          ref={containerRef}
+          ref={boardRef}
           className="relative aspect-video max-w-4xl mx-auto rounded-sm overflow-hidden"
           style={{
             background: `linear-gradient(160deg,
@@ -283,91 +311,172 @@ export default function ChalkboardHero() {
         >
           {/* Subtle board texture */}
           <div
-            className="absolute inset-0 pointer-events-none opacity-[0.08]"
+            className="absolute inset-0 pointer-events-none opacity-[0.06]"
             style={{
               backgroundImage: `
                 repeating-linear-gradient(
                   90deg,
                   transparent,
-                  transparent 2px,
-                  rgba(255,255,255,0.03) 2px,
-                  rgba(255,255,255,0.03) 4px
+                  transparent 3px,
+                  rgba(255,255,255,0.02) 3px,
+                  rgba(255,255,255,0.02) 6px
                 )
+              `,
+            }}
+          />
+
+          {/* Old chalk marks / ghost writing */}
+          <div
+            className="absolute inset-0 pointer-events-none opacity-[0.03]"
+            style={{
+              backgroundImage: `
+                radial-gradient(ellipse at 20% 30%, rgba(255,255,255,0.8) 0%, transparent 15%),
+                radial-gradient(ellipse at 70% 60%, rgba(255,255,255,0.6) 0%, transparent 12%),
+                radial-gradient(ellipse at 45% 80%, rgba(255,255,255,0.5) 0%, transparent 10%)
               `,
             }}
           />
 
           {/* Light reflection at top */}
           <div
-            className="absolute top-0 left-0 right-0 h-20 pointer-events-none"
+            className="absolute top-0 left-0 right-0 h-24 pointer-events-none"
             style={{
-              background: 'linear-gradient(180deg, rgba(255,255,255,0.02) 0%, transparent 100%)',
+              background: 'linear-gradient(180deg, rgba(255,255,255,0.025) 0%, transparent 100%)',
             }}
           />
 
           {/* Dust particles canvas */}
           <canvas
             ref={dustCanvasRef}
-            className="absolute inset-0 w-full h-full pointer-events-none z-10"
+            className="absolute inset-0 w-full h-full pointer-events-none z-20"
           />
 
-          {/* KaTeX equation with reveal animation */}
-          <div className="absolute inset-0 flex items-center justify-center px-4">
-            <div
-              className="relative overflow-hidden"
-              style={{
-                clipPath: `inset(0 ${Math.max(0, 100 - revealProgress * 100)}% 0 0)`,
-              }}
-            >
+          {/* KaTeX equation with stroke-reveal animation */}
+          <div className="absolute inset-0 flex items-center justify-center px-8">
+            <div className="relative">
+              {/* Writing guide line (faint) */}
               <div
-                ref={katexRef}
-                className="katex-chalk whitespace-nowrap"
+                className="absolute left-0 right-0 h-px opacity-5"
                 style={{
-                  color: '#f0efe8',
-                  fontSize: 'clamp(1.1rem, 2.5vw, 2rem)',
-                  textShadow: `
-                    0 0 4px rgba(240, 239, 232, 0.6),
-                    0 0 8px rgba(240, 239, 232, 0.3),
-                    0 0 12px rgba(240, 239, 232, 0.15)
-                  `,
-                  letterSpacing: '0.02em',
+                  top: '50%',
+                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent)',
                 }}
               />
+
+              {/* Equation container with clip reveal */}
+              <div
+                className="relative"
+                style={{
+                  clipPath: `polygon(0 0, ${revealProgress * 100}% 0, ${revealProgress * 100}% 100%, 0 100%)`,
+                }}
+              >
+                <div
+                  ref={katexRef}
+                  className="katex-chalk"
+                  style={{
+                    color: '#f0efe8',
+                    fontSize: 'clamp(1.2rem, 2.8vw, 2.2rem)',
+                    textShadow: `
+                      0 0 2px rgba(240, 239, 232, 0.8),
+                      0 0 6px rgba(240, 239, 232, 0.4),
+                      0 0 12px rgba(240, 239, 232, 0.2)
+                    `,
+                    letterSpacing: '0.03em',
+                    whiteSpace: 'nowrap',
+                  }}
+                />
+              </div>
+
+              {/* Writing edge glow effect */}
+              {animationPhase === 'writing' && (
+                <div
+                  className="absolute top-0 bottom-0 w-8 pointer-events-none"
+                  style={{
+                    left: `${revealProgress * 100}%`,
+                    transform: 'translateX(-50%)',
+                    background: 'linear-gradient(90deg, transparent, rgba(240, 239, 232, 0.15), transparent)',
+                    filter: 'blur(4px)',
+                  }}
+                />
+              )}
             </div>
           </div>
 
-          {/* Chalk stick */}
+          {/* Chalk stick - CSS 3D rendered */}
           <div
-            ref={chalkRef}
-            className="absolute pointer-events-none z-20"
-            style={{ opacity: 0 }}
+            className="absolute pointer-events-none z-30"
+            style={{
+              left: chalkState.x,
+              top: chalkState.y,
+              opacity: animationPhase === 'waiting' ? 0 : chalkState.opacity,
+              transform: `translate(-50%, -100%) rotate(${chalkState.rotation}deg)`,
+              transition: animationPhase === 'complete'
+                ? 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
+                : 'opacity 0.3s ease-out',
+              transformOrigin: 'bottom center',
+            }}
           >
-            <div className="relative">
+            <div className="relative" style={{ perspective: '200px' }}>
               {/* Chalk body */}
               <div
-                className="w-3 h-12 rounded-full"
+                className="relative"
                 style={{
+                  width: '14px',
+                  height: '52px',
+                  borderRadius: '3px 3px 2px 2px',
                   background: `linear-gradient(90deg,
-                    #d4d4cc 0%,
-                    #e8e8e2 20%,
-                    #f5f5f0 50%,
-                    #e8e8e2 80%,
-                    #d4d4cc 100%
+                    #c8c8c0 0%,
+                    #e8e8e2 15%,
+                    #f8f8f4 40%,
+                    #f5f5f0 60%,
+                    #e0e0d8 85%,
+                    #c8c8c0 100%
                   )`,
                   boxShadow: `
-                    inset 1px 0 3px rgba(255,255,255,0.8),
-                    inset -1px 0 2px rgba(0,0,0,0.1),
-                    0 2px 6px rgba(0,0,0,0.3)
+                    inset 2px 0 4px rgba(255,255,255,0.9),
+                    inset -2px 0 3px rgba(0,0,0,0.15),
+                    2px 4px 8px rgba(0,0,0,0.4)
                   `,
+                  transform: 'rotateY(-5deg)',
                 }}
-              />
-              {/* Chalk tip wear */}
-              <div
-                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2.5 h-2 rounded-b-full"
-                style={{
-                  background: 'linear-gradient(180deg, #e0e0d8 0%, #c0c0b8 100%)',
-                }}
-              />
+              >
+                {/* Chalk texture lines */}
+                <div
+                  className="absolute inset-0 rounded-sm opacity-20"
+                  style={{
+                    backgroundImage: `
+                      linear-gradient(0deg,
+                        transparent 0%,
+                        rgba(0,0,0,0.1) 2%,
+                        transparent 4%
+                      )
+                    `,
+                    backgroundSize: '100% 6px',
+                  }}
+                />
+
+                {/* Worn/used tip */}
+                <div
+                  className="absolute bottom-0 left-1/2 -translate-x-1/2"
+                  style={{
+                    width: '12px',
+                    height: '6px',
+                    borderRadius: '0 0 4px 4px',
+                    background: 'linear-gradient(180deg, #d8d8d0 0%, #b8b8b0 100%)',
+                    boxShadow: 'inset 0 2px 2px rgba(255,255,255,0.3)',
+                  }}
+                />
+
+                {/* Chalk dust on tip */}
+                {chalkState.isWriting && (
+                  <div
+                    className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3 h-2 rounded-full animate-pulse"
+                    style={{
+                      background: 'radial-gradient(ellipse, rgba(245,245,240,0.6) 0%, transparent 70%)',
+                    }}
+                  />
+                )}
+              </div>
             </div>
           </div>
 
@@ -393,19 +502,37 @@ export default function ChalkboardHero() {
               style={{ background: 'rgba(255,255,255,0.12)' }}
             />
 
-            {/* Chalk pieces on tray */}
+            {/* Chalk dust accumulation on tray */}
             <div
-              className="absolute bottom-1 right-12 w-2 h-6 rounded-full opacity-60"
+              className="absolute top-1 left-8 right-8 h-1 opacity-30"
               style={{
-                background: 'linear-gradient(90deg, #e0e0d8 0%, #f0f0e8 50%, #e0e0d8 100%)',
-                transform: 'rotate(10deg)',
+                background: 'linear-gradient(90deg, transparent, rgba(245,245,240,0.3) 20%, rgba(245,245,240,0.5) 50%, rgba(245,245,240,0.3) 80%, transparent)',
+              }}
+            />
+
+            {/* Extra chalk pieces on tray */}
+            <div
+              className="absolute bottom-1.5 right-16 w-2.5 h-7 rounded-full opacity-60"
+              style={{
+                background: 'linear-gradient(90deg, #d0d0c8 0%, #f0f0e8 50%, #d0d0c8 100%)',
+                transform: 'rotate(12deg)',
+                boxShadow: '1px 2px 4px rgba(0,0,0,0.3)',
               }}
             />
             <div
-              className="absolute bottom-1.5 right-24 w-1.5 h-4 rounded-full opacity-40"
+              className="absolute bottom-1 right-28 w-2 h-5 rounded-full opacity-50"
               style={{
-                background: 'linear-gradient(90deg, #f0e8a0 0%, #fff8c0 50%, #f0e8a0 100%)',
-                transform: 'rotate(-5deg)',
+                background: 'linear-gradient(90deg, #e8e0a0 0%, #fff8c0 50%, #e8e0a0 100%)',
+                transform: 'rotate(-8deg)',
+                boxShadow: '1px 2px 4px rgba(0,0,0,0.3)',
+              }}
+            />
+            <div
+              className="absolute bottom-2 left-20 w-1.5 h-4 rounded-full opacity-40"
+              style={{
+                background: 'linear-gradient(90deg, #c8e0c8 0%, #d8f0d8 50%, #c8e0c8 100%)',
+                transform: 'rotate(3deg)',
+                boxShadow: '1px 2px 4px rgba(0,0,0,0.3)',
               }}
             />
           </div>
@@ -416,14 +543,20 @@ export default function ChalkboardHero() {
           ref={infoRef}
           className="text-center mt-10 space-y-1"
           style={{
-            opacity: animationPhase === 'complete' ? 1 : 0.4,
-            transition: 'opacity 0.8s ease-out',
+            opacity: animationPhase === 'complete' ? 1 : 0.3,
+            transition: 'opacity 1s ease-out',
           }}
         />
 
         {/* Scroll indicator */}
-        <div className="flex justify-center mt-14 animate-float">
-          <div className="flex flex-col items-center gap-3 text-brass-tarnished hover:text-gold transition-colors duration-300 cursor-pointer">
+        <div
+          className="flex justify-center mt-14"
+          style={{
+            opacity: animationPhase === 'complete' ? 1 : 0,
+            transition: 'opacity 0.8s ease-out 0.5s',
+          }}
+        >
+          <div className="flex flex-col items-center gap-3 text-brass-tarnished hover:text-gold transition-colors duration-300 cursor-pointer animate-float">
             <span className="text-xs tracking-[0.2em] uppercase font-body">Scroll to explore</span>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
