@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 // ═══════════════════════════════════════════════════════════════════════════════
 // BLACKBOARD HERO - Realistic Chalk Writing Animation
 // The chalk follows actual SVG paths, writing proofs stroke by stroke
+// Features: Persistent strokes, realistic speed, chalk texture, smooth movement
 // ═══════════════════════════════════════════════════════════════════════════════
 
 interface ChalkDustParticle {
@@ -23,8 +24,8 @@ interface ChalkDustParticle {
 interface ProofStroke {
   id: string;
   path: string;
-  duration: number; // ms to draw this stroke
-  delayAfter: number; // pause after this stroke
+  duration: number; // ms to draw this stroke (will be scaled by SPEED_MULTIPLIER)
+  delayAfter: number; // pause after this stroke (will be scaled)
 }
 
 interface HandwrittenProof {
@@ -36,6 +37,11 @@ interface HandwrittenProof {
   viewBox: string;
   accessibleText: string;
 }
+
+// Animation speed multiplier - increase this to slow down the animation
+const SPEED_MULTIPLIER = 4;
+// Delay multiplier for pauses between strokes
+const DELAY_MULTIPLIER = 5;
 
 // Handwritten proofs with actual SVG paths that look like chalk writing
 const HANDWRITTEN_PROOFS: HandwrittenProof[] = [
@@ -254,12 +260,18 @@ export default function BlackboardHeroEnhanced() {
   const dustCanvasRef = useRef<HTMLCanvasElement>(null);
   const pathRefs = useRef<Map<string, SVGPathElement>>(new Map());
 
+  // Track which strokes have been completed - persists across renders
+  const completedStrokesRef = useRef<Set<string>>(new Set());
+  // Track if strokes have been initialized
+  const initializedStrokesRef = useRef<Set<string>>(new Set());
+
   const [proof, setProof] = useState<HandwrittenProof | null>(null);
   const [phase, setPhase] = useState<AnimationPhase>('loading');
-  const [currentStrokeIndex, setCurrentStrokeIndex] = useState(-1);
-  const [strokeProgress, setStrokeProgress] = useState(0);
+  const [_currentStrokeIndex, setCurrentStrokeIndex] = useState(-1);
+  const [_strokeProgress, setStrokeProgress] = useState(0);
   const [overallProgress, setOverallProgress] = useState(0);
   const [chalkPos, setChalkPos] = useState({ x: 0, y: 0, rotation: -30 });
+  const [chalkLifted, setChalkLifted] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   const dustParticlesRef = useRef<ChalkDustParticle[]>([]);
@@ -373,11 +385,18 @@ export default function BlackboardHeroEnhanced() {
     };
   }, [prefersReducedMotion]);
 
-  // Main writing animation
+  // Main writing animation with realistic speed and chalk movement
   const startWriting = useCallback(() => {
     if (!proof || !svgRef.current || prefersReducedMotion) {
       // If reduced motion, show complete immediately
       if (proof) {
+        proof.strokes.forEach((stroke) => {
+          completedStrokesRef.current.add(stroke.id);
+          const pathEl = pathRefs.current.get(stroke.id);
+          if (pathEl) {
+            pathEl.style.strokeDashoffset = '0';
+          }
+        });
         setCurrentStrokeIndex(proof.strokes.length);
         setOverallProgress(1);
         setPhase('complete');
@@ -388,13 +407,15 @@ export default function BlackboardHeroEnhanced() {
     setPhase('writing');
     const strokes = proof.strokes;
     let strokeIdx = 0;
-    const startTime = performance.now();
-    let strokeStartTime = startTime;
+    let strokeStartTime = performance.now();
+    let isRepositioning = false;
+    let repositionStartTime = 0;
 
     const animate = (currentTime: number) => {
       if (strokeIdx >= strokes.length) {
         setPhase('complete');
         setOverallProgress(1);
+        setChalkLifted(true);
         setChalkPos(prev => ({ ...prev, x: 700, y: 180, rotation: 70 }));
         return;
       }
@@ -410,13 +431,62 @@ export default function BlackboardHeroEnhanced() {
         return;
       }
 
+      // Apply speed multiplier to duration
+      const scaledDuration = stroke.duration * SPEED_MULTIPLIER;
+      const scaledDelay = stroke.delayAfter * DELAY_MULTIPLIER;
+
+      // Handle repositioning between strokes (chalk lifts and moves to next position)
+      if (isRepositioning) {
+        const repositionDuration = 300; // ms to move to next stroke start
+        const repositionElapsed = currentTime - repositionStartTime;
+        const repositionProgress = Math.min(repositionElapsed / repositionDuration, 1);
+
+        // Ease in-out for smooth movement
+        const easedReposition = repositionProgress < 0.5
+          ? 2 * repositionProgress * repositionProgress
+          : 1 - Math.pow(-2 * repositionProgress + 2, 2) / 2;
+
+        // Get target position (start of next stroke)
+        const nextPoint = getPointOnPath(pathEl, 0);
+        const svg = svgRef.current!;
+        const svgRect = svg.getBoundingClientRect();
+        const board = boardRef.current!;
+        const boardRect = board.getBoundingClientRect();
+        const vb = proof.viewBox.split(' ').map(Number);
+        const scaleX = svgRect.width / vb[2];
+        const scaleY = svgRect.height / vb[3];
+
+        const targetX = (svgRect.left - boardRect.left) + (nextPoint.x * scaleX);
+        const targetY = (svgRect.top - boardRect.top) + (nextPoint.y * scaleY);
+
+        // Interpolate position with arc motion (lift up in middle)
+        const liftAmount = Math.sin(easedReposition * Math.PI) * 40;
+        setChalkPos(prev => ({
+          x: prev.x + (targetX - prev.x) * easedReposition,
+          y: prev.y + (targetY - prev.y) * easedReposition - liftAmount,
+          rotation: -30 + Math.sin(easedReposition * Math.PI) * 10,
+        }));
+        setChalkLifted(repositionProgress < 0.9);
+
+        if (repositionProgress >= 1) {
+          isRepositioning = false;
+          strokeStartTime = currentTime;
+          setChalkLifted(false);
+        }
+
+        animationRef.current = requestAnimationFrame(animate);
+        return;
+      }
+
       const elapsed = currentTime - strokeStartTime;
-      const progress = Math.min(elapsed / stroke.duration, 1);
+      const progress = Math.min(elapsed / scaledDuration, 1);
 
-      // Ease-out for natural feel
-      const easedProgress = 1 - Math.pow(1 - progress, 2.5);
+      // Ease-out with slight acceleration at start for natural pen feel
+      const easedProgress = progress < 0.1
+        ? progress * progress * 10
+        : 1 - Math.pow(1 - progress, 2.5);
 
-      // Update stroke visibility using dashoffset
+      // Update stroke visibility using dashoffset - CRITICAL: stroke persists
       const length = pathEl.getTotalLength();
       pathEl.style.strokeDasharray = `${length}`;
       pathEl.style.strokeDashoffset = `${length * (1 - easedProgress)}`;
@@ -424,10 +494,10 @@ export default function BlackboardHeroEnhanced() {
       // Get chalk position on path
       const point = getPointOnPath(pathEl, easedProgress);
 
-      // Add natural wobble
-      const wobbleX = Math.sin(easedProgress * Math.PI * 12) * 1.5;
-      const wobbleY = Math.sin(easedProgress * Math.PI * 8) * 1;
-      const wobbleRot = Math.sin(easedProgress * Math.PI * 6) * 3;
+      // Add natural wobble - more subtle for realistic feel
+      const wobbleX = Math.sin(easedProgress * Math.PI * 8) * 1.2;
+      const wobbleY = Math.sin(easedProgress * Math.PI * 6) * 0.8;
+      const wobbleRot = Math.sin(easedProgress * Math.PI * 4) * 2;
 
       // Scale SVG coordinates to board coordinates
       const svg = svgRef.current!;
@@ -452,26 +522,40 @@ export default function BlackboardHeroEnhanced() {
       setStrokeProgress(easedProgress);
       setOverallProgress((strokeIdx + easedProgress) / strokes.length);
 
-      // Spawn dust while writing
-      if (easedProgress < 1 && Math.random() > 0.7) {
+      // Spawn dust while writing - more particles for realism
+      if (easedProgress < 1 && Math.random() > 0.5) {
         spawnDust(chalkX, chalkY + 35);
       }
 
       if (progress >= 1) {
+        // Mark stroke as completed - THIS IS KEY FOR PERSISTENCE
+        completedStrokesRef.current.add(stroke.id);
+
+        // Ensure the stroke stays visible
+        pathEl.style.strokeDashoffset = '0';
+
         // Move to next stroke after delay
         setTimeout(() => {
           strokeIdx++;
-          strokeStartTime = performance.now();
           setCurrentStrokeIndex(strokeIdx);
           setStrokeProgress(0);
+
+          // Start repositioning to next stroke
+          if (strokeIdx < strokes.length) {
+            isRepositioning = true;
+            repositionStartTime = performance.now();
+            setChalkLifted(true);
+          }
+
           animationRef.current = requestAnimationFrame(animate);
-        }, stroke.delayAfter);
+        }, scaledDelay);
       } else {
         animationRef.current = requestAnimationFrame(animate);
       }
     };
 
     setCurrentStrokeIndex(0);
+    setChalkLifted(false);
     animationRef.current = requestAnimationFrame(animate);
   }, [proof, prefersReducedMotion, getPointOnPath, spawnDust]);
 
@@ -497,8 +581,9 @@ export default function BlackboardHeroEnhanced() {
   const handleSkip = () => {
     cancelAnimationFrame(animationRef.current);
     if (proof) {
-      // Reveal all strokes
+      // Reveal all strokes and mark them as completed
       proof.strokes.forEach((stroke) => {
+        completedStrokesRef.current.add(stroke.id);
         const pathEl = pathRefs.current.get(stroke.id);
         if (pathEl) {
           pathEl.style.strokeDashoffset = '0';
@@ -507,24 +592,32 @@ export default function BlackboardHeroEnhanced() {
       setCurrentStrokeIndex(proof.strokes.length);
       setOverallProgress(1);
       setPhase('complete');
+      setChalkLifted(true);
       setChalkPos({ x: 700, y: 180, rotation: 70 });
     }
   };
 
   const handleReplay = () => {
     if (proof) {
-      // Reset all strokes
+      // Clear completed strokes tracking
+      completedStrokesRef.current.clear();
+      initializedStrokesRef.current.clear();
+
+      // Reset all strokes to hidden
       proof.strokes.forEach((stroke) => {
         const pathEl = pathRefs.current.get(stroke.id);
         if (pathEl) {
           const length = pathEl.getTotalLength();
           pathEl.style.strokeDasharray = `${length}`;
           pathEl.style.strokeDashoffset = `${length}`;
+          initializedStrokesRef.current.add(stroke.id);
         }
       });
+
       setCurrentStrokeIndex(-1);
       setStrokeProgress(0);
       setOverallProgress(0);
+      setChalkLifted(false);
       setPhase('ready');
     }
   };
@@ -555,14 +648,23 @@ export default function BlackboardHeroEnhanced() {
     };
   }, []);
 
-  // Store path refs
+  // Store path refs - PRESERVES completed strokes
   const setPathRef = useCallback((id: string, el: SVGPathElement | null) => {
     if (el) {
       pathRefs.current.set(id, el);
-      // Initialize stroke
-      const length = el.getTotalLength();
-      el.style.strokeDasharray = `${length}`;
-      el.style.strokeDashoffset = `${length}`;
+
+      // CRITICAL: Only initialize strokes that haven't been completed
+      // This prevents completed strokes from disappearing on re-render
+      if (completedStrokesRef.current.has(id)) {
+        // Stroke was already drawn - keep it visible
+        el.style.strokeDashoffset = '0';
+      } else if (!initializedStrokesRef.current.has(id)) {
+        // First time seeing this stroke - initialize it hidden
+        const length = el.getTotalLength();
+        el.style.strokeDasharray = `${length}`;
+        el.style.strokeDashoffset = `${length}`;
+        initializedStrokesRef.current.add(id);
+      }
     }
   }, []);
 
@@ -628,23 +730,56 @@ export default function BlackboardHeroEnhanced() {
               aria-hidden="true"
             >
               <defs>
-                <filter id="chalk-glow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feGaussianBlur stdDeviation="0.8" result="blur" />
+                {/* Chalk texture filter - creates realistic chalk-like appearance */}
+                <filter id="chalk-texture" x="-20%" y="-20%" width="140%" height="140%">
+                  {/* Add noise for chalk grain */}
+                  <feTurbulence
+                    type="fractalNoise"
+                    baseFrequency="0.9"
+                    numOctaves="4"
+                    result="noise"
+                    seed="42"
+                  />
+                  {/* Displace edges slightly for rough chalk look */}
+                  <feDisplacementMap
+                    in="SourceGraphic"
+                    in2="noise"
+                    scale="1.5"
+                    xChannelSelector="R"
+                    yChannelSelector="G"
+                    result="displaced"
+                  />
+                  {/* Subtle blur for chalk softness */}
+                  <feGaussianBlur in="displaced" stdDeviation="0.3" result="blurred" />
+                  {/* Add slight glow for chalk dust effect */}
+                  <feGaussianBlur in="blurred" stdDeviation="1" result="glow" />
+                  {/* Merge glow with main stroke */}
+                  <feMerge>
+                    <feMergeNode in="glow" />
+                    <feMergeNode in="blurred" />
+                  </feMerge>
+                </filter>
+
+                {/* Simpler filter for performance on weaker devices */}
+                <filter id="chalk-simple" x="-10%" y="-10%" width="120%" height="120%">
+                  <feGaussianBlur stdDeviation="0.4" result="blur" />
                   <feMerge>
                     <feMergeNode in="blur" />
                     <feMergeNode in="SourceGraphic" />
                   </feMerge>
                 </filter>
               </defs>
-              <g filter="url(#chalk-glow)">
+
+              {/* Main chalk strokes with texture */}
+              <g filter="url(#chalk-texture)">
                 {proof.strokes.map((stroke) => (
                   <path
                     key={stroke.id}
                     ref={(el) => setPathRef(stroke.id, el)}
                     d={stroke.path}
                     fill="none"
-                    stroke="#e8e4d9"
-                    strokeWidth="3"
+                    stroke="#f0ebe0"
+                    strokeWidth="3.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     style={{
@@ -656,7 +791,7 @@ export default function BlackboardHeroEnhanced() {
             </svg>
           )}
 
-          {/* 3D Chalk */}
+          {/* 3D Chalk - responds to lifted state */}
           {!prefersReducedMotion && phase !== 'loading' && (
             <div
               className="absolute pointer-events-none z-30"
@@ -664,8 +799,8 @@ export default function BlackboardHeroEnhanced() {
                 left: chalkPos.x,
                 top: chalkPos.y,
                 opacity: phase === 'complete' ? 0.7 : 1,
-                transform: `translate(-50%, -100%) rotate(${chalkPos.rotation}deg)`,
-                transition: phase === 'complete' ? 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)' : 'none',
+                transform: `translate(-50%, -100%) rotate(${chalkPos.rotation}deg) ${chalkLifted ? 'translateZ(20px) scale(1.05)' : ''}`,
+                transition: chalkLifted || phase === 'complete' ? 'all 0.15s ease-out' : 'none',
                 transformOrigin: 'bottom center',
               }}
             >
@@ -676,8 +811,11 @@ export default function BlackboardHeroEnhanced() {
                     height: '45px',
                     borderRadius: '3px 3px 2px 2px',
                     background: 'linear-gradient(90deg, #b8b8b0 0%, #e8e8e2 20%, #f5f5f0 50%, #e8e8e2 80%, #b8b8b0 100%)',
-                    boxShadow: 'inset 2px 0 3px rgba(255,255,255,0.7), inset -2px 0 2px rgba(0,0,0,0.1), 2px 3px 6px rgba(0,0,0,0.3)',
-                    transform: 'rotateY(-5deg)',
+                    boxShadow: chalkLifted
+                      ? 'inset 2px 0 3px rgba(255,255,255,0.7), inset -2px 0 2px rgba(0,0,0,0.1), 4px 8px 15px rgba(0,0,0,0.4)'
+                      : 'inset 2px 0 3px rgba(255,255,255,0.7), inset -2px 0 2px rgba(0,0,0,0.1), 2px 3px 6px rgba(0,0,0,0.3)',
+                    transform: `rotateY(-5deg) ${chalkLifted ? 'rotateX(5deg)' : ''}`,
+                    transition: 'box-shadow 0.15s ease-out, transform 0.15s ease-out',
                   }}
                 >
                   <div className="absolute inset-0 rounded-sm opacity-15" style={{
@@ -693,7 +831,8 @@ export default function BlackboardHeroEnhanced() {
                       background: 'linear-gradient(180deg, #d0d0c8 0%, #a8a8a0 100%)',
                     }}
                   />
-                  {phase === 'writing' && (
+                  {/* Contact point glow - only when writing (not lifted) */}
+                  {phase === 'writing' && !chalkLifted && (
                     <div
                       className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2.5 h-1.5 rounded-full animate-pulse"
                       style={{ background: 'radial-gradient(ellipse, rgba(245,245,240,0.5) 0%, transparent 70%)' }}
