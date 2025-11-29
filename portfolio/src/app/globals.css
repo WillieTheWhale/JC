@@ -1,0 +1,940 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import Google Fonts - Scholarly Typography */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,400&family=Fira+Code:wght@400;500&family=Spectral:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap');
+
+/* KaTeX styles */
+@import 'katex/dist/katex.min.css';
+
+/* ═══════════════════════════════════════════════════════════════════════════════════
+   DARK ACADEMIA DESIGN SYSTEM - ROOT VARIABLES
+   Inspired by Trinity College Long Room, Oxford Libraries, Candlelit Studies
+   ═══════════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ═══════════════════════════════════════════════════════════════════════════
+     PRIMARY PALETTE: EUCLIDEAN SAGE GREEN
+     The signature color - a darker, scholarly sage that evokes moss-covered
+     stone, ancient libraries, and the patina of aged copper
+     ═══════════════════════════════════════════════════════════════════════════ */
+  --color-sage-primary: #3A4A3A;
+  --color-sage-deep: #2A3A2A;
+  --color-sage-deepest: #1A2A1A;
+  --color-sage-light: #4A5A4A;
+  --color-sage-muted: #5A6B5A;
+  --color-sage-bright: #6A7B6A;
+
+  /* ─── Secondary: Warm Wood Accents ─── */
+  --color-walnut: #2D1810;
+  --color-walnut-deep: #1A0F0A;
+  --color-mahogany: #4A2C2A;
+  --color-oak: #5C4033;
+  --color-oak-light: #7C6053;
+
+  /* ─── Parchment & Paper ─── */
+  --color-parchment: #E8DCC4;
+  --color-parchment-aged: #D4C4A8;
+  --color-parchment-dark: #C4B498;
+  --color-vellum: #F5EFE0;
+  --color-ivory: #FFFEF7;
+  --color-sepia: #704214;
+  --color-cream: #F5F1E6;
+
+  /* ─── Metallic Accents ─── */
+  --color-gold: #C9A227;
+  --color-gold-leaf: #D4AF37;
+  --color-gold-bright: #E4BF47;
+  --color-brass: #8B7355;
+  --color-brass-tarnished: #6B5344;
+  --color-copper: #B87333;
+  --color-copper-verdigris: #4A8B6B;
+
+  /* ─── Atmospheric Colors ─── */
+  --color-candlelight: rgba(244, 208, 63, 0.12);
+  --color-candleglow: #F4D03F;
+  --color-lamplight: rgba(255, 200, 100, 0.08);
+  --color-shadow: #0D0906;
+  --color-ink: #1A1612;
+  --color-charcoal: #2C2824;
+
+  /* ─── Chalkboard: Sage-Tinted Slate ─── */
+  --color-slate: #1E2D28;
+  --color-slate-deep: #141F1A;
+  --color-slate-sage: #1A2A25;
+  --color-chalk-white: #F5F5F0;
+  --color-chalk-yellow: #F5E6A3;
+  --color-chalk-pink: #E8B4B8;
+  --color-chalk-blue: #A8C5D8;
+  --color-chalk-sage: #C4D8C4;
+
+  /* ─── Gothic Stone Colors ─── */
+  --color-stone: #4A4A48;
+  --color-stone-light: #6A6A68;
+  --color-stone-dark: #2A2A28;
+  --color-moss: #3A4B3A;
+
+  /* ─── Accent Colors ─── */
+  --color-burgundy: #722F37;
+  --color-forest: #2D4A3E;
+  --color-navy: #1A2A3A;
+
+  /* ─── Shadows & Depth ─── */
+  --shadow-ambient: 0 0 100px 50px rgba(58, 74, 58, 0.08);
+  --shadow-sage-glow: 0 0 40px rgba(58, 74, 58, 0.15);
+  --shadow-card:
+    0 4px 6px rgba(26, 42, 26, 0.2),
+    0 10px 20px rgba(26, 42, 26, 0.15),
+    0 1px 3px rgba(26, 42, 26, 0.25);
+  --shadow-card-hover:
+    0 8px 16px rgba(26, 42, 26, 0.25),
+    0 20px 40px rgba(26, 42, 26, 0.2),
+    0 2px 6px rgba(26, 42, 26, 0.3);
+  --shadow-elevated:
+    0 25px 50px rgba(26, 42, 26, 0.35),
+    0 10px 20px rgba(26, 42, 26, 0.25);
+  --shadow-inset: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+  --shadow-vignette: inset 0 0 150px rgba(26, 42, 26, 0.5);
+
+  /* ─── Transitions ─── */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 600ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-weighted: 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  /* ─── Page Variables: Sage Green Primary ─── */
+  --background: var(--color-sage-deep);
+  --foreground: var(--color-parchment);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════════
+   BASE STYLES
+   ═══════════════════════════════════════════════════════════════════════════════════ */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--color-sage-deepest);
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: 'EB Garamond', 'Crimson Pro', Georgia, serif;
+  font-size: 18px;
+  line-height: 1.8;
+  overflow-x: hidden;
+  min-height: 100vh;
+
+  /* Subtle paper texture */
+  background-image:
+    radial-gradient(ellipse at top, rgba(244, 208, 63, 0.02) 0%, transparent 50%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════════
+   TYPOGRAPHY - Scholarly & Elegant
+   ═══════════════════════════════════════════════════════════════════════════════════ */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--color-parchment);
+  letter-spacing: 0.02em;
+}
+
+h1 {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 400;
+  letter-spacing: 0.05em;
+}
+
+h2 {
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-weight: 500;
+}
+
+h3 {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+}
+
+p {
+  margin-bottom: 1.5em;
+  color: var(--color-parchment-aged);
+}
+
+a {
+  color: var(--color-gold);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-gold-leaf);
+}
+
+blockquote {
+  font-family: 'Spectral', Georgia, serif;
+  font-style: italic;
+  font-size: 1.25rem;
+  color: var(--color-parchment-aged);
+  border-left: 2px solid var(--color-gold);
+  padding-left: 1.5rem;
+  margin: 2rem 0;
+}
+
+code, pre {
+  font-family: 'Fira Code', Consolas, monospace;
+  font-size: 0.9em;
+}
+
+.font-decorative {
+  font-family: 'Spectral', Georgia, serif;
+}
+
+.font-heading {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+/* Small caps for emphasis */
+.small-caps {
+  font-variant: small-caps;
+  letter-spacing: 0.1em;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════════
+   TEXTURES & BACKGROUNDS
+   ═══════════════════════════════════════════════════════════════════════════════════ */
+
+/* Aged Parchment texture */
+.texture-parchment {
+  background-color: var(--color-parchment);
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='5'/%3E%3CfeColorMatrix values='0 0 0 0 0.9 0 0 0 0 0.85 0 0 0 0 0.75 0 0 0 0.15 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper)'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(0,0,0,0.05) 100%);
+  position: relative;
+}
+
+.texture-parchment::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 0%, rgba(139, 115, 85, 0.1) 100%);
+  pointer-events: none;
+}
+
+/* Wood grain texture */
+.texture-wood {
+  background-color: var(--color-oak);
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgba(0,0,0,0.03) 0px,
+      rgba(0,0,0,0.03) 1px,
+      transparent 1px,
+      transparent 20px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,0.02) 0px,
+      transparent 2px,
+      transparent 4px
+    ),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='wood'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.02 0.15' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23wood)' opacity='0.15'/%3E%3C/svg%3E");
+}
+
+/* Leather texture */
+.texture-leather {
+  background-color: var(--color-mahogany);
+  background-image:
+    radial-gradient(circle at 20% 80%, rgba(255,255,255,0.03) 0%, transparent 50%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='leather'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.5' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23leather)'/%3E%3C/svg%3E");
+}
+
+/* Slate/Chalkboard texture */
+.texture-slate {
+  background-color: var(--color-slate-deep);
+  background-image:
+    radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.02) 0%, transparent 40%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='slate'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.12 0 0 0 0 0.18 0 0 0 0 0.19 0 0 0 0.4 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23slate)'/%3E%3C/svg%3E");
+  position: relative;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════════
+   CHALKBOARD STYLES - Living Chalkboard System
+   Multiple variants: classic dark, green, slate gray, worn
+   ═══════════════════════════════════════════════════════════════════════════════════ */
+
+/* Base chalkboard - Dark slate (default) */
+.chalkboard {
+  background-color: var(--color-slate-deep);
+  position: relative;
+  border-radius: 4px;
+  box-shadow:
+    inset 0 0 60px rgba(0, 0, 0, 0.3),
+    0 10px 40px rgba(0, 0, 0, 0.4),
+    0 0 0 8px var(--color-oak),
+    0 0 0 10px var(--color-brass-tarnished);
+}
+
+.chalkboard::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  background-image:
+    radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.015) 0%, transparent 50%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+/* ─── Green Chalkboard - Classic classroom ─── */
+.chalkboard-green {
+  background: linear-gradient(
+    135deg,
+    #1E3A2F 0%,
+    #1A332A 50%,
+    #152D24 100%
+  );
+  position: relative;
+  border-radius: 4px;
+  box-shadow:
+    inset 0 0 80px rgba(0, 0, 0, 0.25),
+    inset 0 0 20px rgba(30, 58, 47, 0.3),
+    0 10px 40px rgba(0, 0, 0, 0.4),
+    0 0 0 8px var(--color-oak),
+    0 0 0 10px var(--color-brass-tarnished);
+}
+
+.chalkboard-green::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  background-image:
+    radial-gradient(ellipse at 25% 15%, rgba(100, 150, 100, 0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 75% 85%, rgba(50, 100, 70, 0.02) 0%, transparent 40%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='greenNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.15 0 0 0 0 0.12 0 0 0 0.12 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23greenNoise)'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+/* ─── Slate Gray Chalkboard - Formal/modern ─── */
+.chalkboard-slate {
+  background: linear-gradient(
+    135deg,
+    #2A2D30 0%,
+    #1E2124 50%,
+    #18191C 100%
+  );
+  position: relative;
+  border-radius: 4px;
+  box-shadow:
+    inset 0 0 70px rgba(0, 0, 0, 0.35),
+    inset 0 0 15px rgba(60, 65, 70, 0.2),
+    0 10px 40px rgba(0, 0, 0, 0.45),
+    0 0 0 6px #3A3D40,
+    0 0 0 8px #2A2D30;
+}
+
+.chalkboard-slate::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  background-image:
+    radial-gradient(ellipse at 20% 20%, rgba(150, 160, 170, 0.02) 0%, transparent 50%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='slateNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.15 0 0 0 0 0.16 0 0 0 0 0.18 0 0 0 0.1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23slateNoise)'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+/* ─── Worn Chalkboard - Aged with character ─── */
+.chalkboard-worn {
+  background: linear-gradient(
+    145deg,
+    #1A2520 0%,
+    #151E1A 40%,
+    #1D2823 70%,
+    #141C18 100%
+  );
+  position: relative;
+  border-radius: 4px;
+  box-shadow:
+    inset 0 0 100px rgba(0, 0, 0, 0.4),
+    inset 0 50px 80px -50px rgba(80, 70, 50, 0.1),
+    0 10px 40px rgba(0, 0, 0, 0.4),
+    0 0 0 8px #4A3828,
+    0 0 0 10px #3A2A1A;
+}
+
+.chalkboard-worn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  background-image:
+    /* Worn patches showing wood grain */
+    radial-gradient(ellipse at 10% 90%, rgba(74, 56, 40, 0.15) 0%, transparent 20%),
+    radial-gradient(ellipse at 95% 5%, rgba(74, 56, 40, 0.1) 0%, transparent 15%),
+    radial-gradient(ellipse at 80% 95%, rgba(74, 56, 40, 0.12) 0%, transparent 18%),
+    /* Eraser smudges */
+    radial-gradient(ellipse at 40% 30%, rgba(200, 200, 190, 0.015) 0%, transparent 25%),
+    radial-gradient(ellipse at 60% 70%, rgba(200, 200, 190, 0.01) 0%, transparent 20%),
+    /* Base texture */
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='wornNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.08 0 0 0 0 0.1 0 0 0 0 0.09 0 0 0 0.15 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23wornNoise)'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+/* Chalk dust accumulation at bottom */
+.chalkboard-worn::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  border-radius: 0 0 4px 4px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(200, 195, 180, 0.02) 50%,
+    rgba(200, 195, 180, 0.04) 100%
+  );
+  pointer-events: none;
+}
+
+/* ─── Chalk text styling ─── */
+.chalk-text {
+  color: var(--color-chalk-white);
+  text-shadow:
+    0 0 1px rgba(245,245,240,0.8),
+    0 0 3px rgba(245,245,240,0.4),
+    0 0 8px rgba(245,245,240,0.2);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+/* Chalk color variants */
+.chalk-white { color: var(--color-chalk-white); text-shadow: 0 0 2px rgba(245,245,240,0.6); }
+.chalk-yellow { color: var(--color-chalk-yellow); text-shadow: 0 0 3px rgba(245,230,163,0.5); }
+.chalk-pink { color: var(--color-chalk-pink); text-shadow: 0 0 3px rgba(232,180,184,0.5); }
+.chalk-blue { color: var(--color-chalk-blue); text-shadow: 0 0 3px rgba(168,197,216,0.5); }
+.chalk-sage { color: var(--color-chalk-sage); text-shadow: 0 0 3px rgba(196,216,196,0.5); }
+
+/* ─── KaTeX Chalk Styling ─── */
+/* Styles for mathematical equations rendered with chalk effect */
+.katex-chalk {
+  color: var(--color-chalk-white) !important;
+}
+
+.katex-chalk .katex {
+  color: inherit;
+}
+
+.katex-chalk .katex-html {
+  color: inherit;
+}
+
+/* Style all KaTeX text elements for chalk appearance */
+.katex-chalk .katex .mord,
+.katex-chalk .katex .mop,
+.katex-chalk .katex .mbin,
+.katex-chalk .katex .mrel,
+.katex-chalk .katex .mopen,
+.katex-chalk .katex .mclose,
+.katex-chalk .katex .mpunct,
+.katex-chalk .katex .minner {
+  color: var(--color-chalk-white);
+}
+
+/* Ensure fractions and other structures are chalk-colored */
+.katex-chalk .katex .frac-line {
+  border-bottom-color: var(--color-chalk-white);
+}
+
+.katex-chalk .katex .sqrt > .sqrt-sign {
+  color: var(--color-chalk-white);
+}
+
+.katex-chalk .katex .sqrt > .vlist {
+  color: var(--color-chalk-white);
+}
+
+/* Style the rule lines in fractions */
+.katex-chalk .katex .mfrac > .vlist-t > .vlist-r > .vlist > span > .pstrut + span.frac-line {
+  background: var(--color-chalk-white);
+}
+
+/* Make sure all text is chalk white */
+.katex-chalk .katex .mathnormal,
+.katex-chalk .katex .mathit,
+.katex-chalk .katex .mathrm,
+.katex-chalk .katex .mathbf,
+.katex-chalk .katex .mathsf,
+.katex-chalk .katex .mathtt,
+.katex-chalk .katex .mathbb {
+  color: var(--color-chalk-white);
+}
+
+/* Style operators and symbols */
+.katex-chalk .katex .op-symbol,
+.katex-chalk .katex .large-op {
+  color: var(--color-chalk-white);
+}
+
+/* Subtle texture effect on chalk text */
+.katex-chalk .katex-display {
+  text-shadow:
+    0 0 1px rgba(245, 245, 240, 0.9),
+    0 0 4px rgba(245, 245, 240, 0.4),
+    1px 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+/* ─── Chalk ledge ─── */
+.chalk-ledge {
+  background: linear-gradient(
+    180deg,
+    var(--color-oak) 0%,
+    #3D2B1F 50%,
+    #2A1F15 100%
+  );
+  box-shadow:
+    inset 0 2px 4px rgba(255,255,255,0.1),
+    inset 0 -2px 4px rgba(0,0,0,0.3),
+    0 4px 8px rgba(0,0,0,0.3);
+}
+
+/* ─── Chalk writing animation ─── */
+@keyframes chalkWrite {
+  0% {
+    opacity: 0;
+    filter: blur(2px);
+  }
+  50% {
+    opacity: 0.7;
+    filter: blur(1px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+.animate-chalk-write {
+  animation: chalkWrite 0.4s ease-out forwards;
+}
+
+/* ─── Chalk underline animation ─── */
+@keyframes chalkUnderline {
+  0% {
+    stroke-dashoffset: 100%;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+.chalk-underline-anim {
+  stroke-dasharray: 100%;
+  animation: chalkUnderline 0.5s ease-out forwards;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════════
+   CARDS & CONTAINERS
+   ═══════════════════════════════════════════════════════════════════════════════════ */
+
+.card {
+  background: linear-gradient(
+    135deg,
+    var(--color-parchment) 0%,
+    var(--color-parchment-aged) 100%
+  );
+  border-radius: 2px;
+  box-shadow: var(--shadow-card);
+  transition:
+    transform var(--transition-spring),
+    box-shadow var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* Card with dark theme */
+.card-dark {
+  background: linear-gradient(
+    135deg,
+    var(--color-charcoal) 0%,
+    var(--color-ink) 100%
+  );
+  color: var(--color-parchment);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════════
+   BUTTONS - Typewriter Style
+   ═══════════════════════════════════════════════════════════════════════════════════ */
+
+.btn {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.875rem 2rem;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
+  position: relative;
+}
+
+.btn-primary {
+  background: linear-gradient(
+    180deg,
+    var(--color-gold) 0%,
+    var(--color-brass) 100%
+  );
+  color: var(--color-walnut-deep);
+  box-shadow:
+    0 4px 0 var(--color-brass-tarnished),
+    0 6px 12px rgba(0,0,0,0.3);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(
+    180deg,
+    var(--color-gold-leaf) 0%,
+    var(--color-gold) 100%
+  );
+}
+
+.btn-primary:active {
+  transform: translateY(4px);
+  box-shadow:
+    0 0 0 var(--color-brass-tarnished),
+    0 2px 4px rgba(0,0,0,0.2);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--color-parchment);
+  border: 1px solid var(--color-brass);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.btn-secondary:hover {
+  background: rgba(201, 162, 39, 0.1);
+  border-color: var(--color-gold);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════════
+   GOTHIC SVG ANIMATIONS
+   ═══════════════════════════════════════════════════════════════════════════════════ */
+
+.gothic-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: drawPath 1.2s ease-out forwards;
+}
+
+@keyframes drawPath {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Hidden symbols in tracery */
+.tracery-symbol {
+  opacity: 0;
+  transform: scale(0.8);
+  filter: blur(4px);
+  transition: all 400ms ease-out 200ms;
+}
+
+.tracery-reveal:hover .tracery-symbol {
+  opacity: 1;
+  transform: scale(1);
+  filter: blur(0);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════════
+   VIGNETTE & ATMOSPHERIC EFFECTS
+   ═══════════════════════════════════════════════════════════════════════════════════ */
+
+.vignette {
+  position: relative;
+}
+
+.vignette::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    transparent 50%,
+    rgba(13, 9, 6, 0.4) 100%
+  );
+  pointer-events: none;
+}
+
+/* Candlelight glow effect */
+.candlelight {
+  position: relative;
+}
+
+.candlelight::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 800px;
+  height: 400px;
+  background: radial-gradient(
+    ellipse at top,
+    rgba(244, 208, 63, 0.06) 0%,
+    rgba(244, 208, 63, 0.02) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════════
+   SECTION DIVIDERS
+   ═══════════════════════════════════════════════════════════════════════════════════ */
+
+.divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin: 4rem 0;
+  color: var(--color-brass);
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--color-brass-tarnished) 50%,
+    transparent 100%
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════════
+   SCROLLBAR STYLING
+   ═══════════════════════════════════════════════════════════════════════════════════ */
+
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-walnut-deep);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    var(--color-brass) 0%,
+    var(--color-brass-tarnished) 100%
+  );
+  border-radius: 6px;
+  border: 2px solid var(--color-walnut-deep);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gold);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════════
+   FOCUS & ACCESSIBILITY
+   ═══════════════════════════════════════════════════════════════════════════════════ */
+
+:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 3px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════════
+   ANIMATION KEYFRAMES
+   ═══════════════════════════════════════════════════════════════════════════════════ */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(-30deg); }
+  50% { transform: translateY(-8px) rotate(-28deg); }
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.95; }
+  75% { opacity: 0.98; }
+}
+
+@keyframes writeChalk {
+  0% { stroke-dashoffset: 1; }
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes dustDrift {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(40px) translateX(20px);
+    opacity: 0;
+  }
+}
+
+@keyframes rotateSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes breathe {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.005);
+  }
+}
+
+.animate-breathe {
+  animation: breathe 8s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════════
+   UTILITY CLASSES
+   ═══════════════════════════════════════════════════════════════════════════════════ */
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+
+  .animate-fade-up {
+    animation: fadeUp 0.8s ease-out forwards;
+  }
+
+  .animate-float {
+    animation: float 4s ease-in-out infinite;
+  }
+
+  .animate-flicker {
+    animation: flicker 3s ease-in-out infinite;
+  }
+
+  /* Stagger animation children */
+  .animate-stagger > * {
+    animation: fadeUp 0.6s ease-out forwards;
+    opacity: 0;
+  }
+
+  .animate-stagger > *:nth-child(1) { animation-delay: 0ms; }
+  .animate-stagger > *:nth-child(2) { animation-delay: 100ms; }
+  .animate-stagger > *:nth-child(3) { animation-delay: 200ms; }
+  .animate-stagger > *:nth-child(4) { animation-delay: 300ms; }
+  .animate-stagger > *:nth-child(5) { animation-delay: 400ms; }
+  .animate-stagger > *:nth-child(6) { animation-delay: 500ms; }
+  .animate-stagger > *:nth-child(7) { animation-delay: 600ms; }
+  .animate-stagger > *:nth-child(8) { animation-delay: 700ms; }
+
+  /* Gold text gradient */
+  .text-gold-gradient {
+    background: linear-gradient(
+      180deg,
+      var(--color-gold-leaf) 0%,
+      var(--color-gold) 50%,
+      var(--color-brass) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════════
+   KATEX OVERRIDES
+   ═══════════════════════════════════════════════════════════════════════════════════ */
+
+.katex {
+  font-size: 1.1em;
+}
+
+.katex-display {
+  margin: 1.5rem 0;
+}
+
+/* Chalk style for KaTeX */
+.chalk-math .katex {
+  color: var(--color-chalk-white);
+  text-shadow:
+    0 0 1px rgba(245,245,240,0.8),
+    0 0 3px rgba(245,245,240,0.4);
+}
